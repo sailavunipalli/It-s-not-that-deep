@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>It's Not That Deep — Submit a Claim</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Submit a Claim</h1>
+
+    <div id="auth-section">
+      <h2>Login / Signup</h2>
+
+      <label for="auth-display-name">Display Name (for signup only)</label>
+      <input type="text" id="auth-display-name" placeholder="Your name" />
+
+      <label for="auth-email">Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" />
+
+      <label for="auth-password">Password</label>
+      <input type="password" id="auth-password" placeholder="Password" />
+
+      <button id="signup-btn">Sign Up</button>
+      <button id="login-btn">Log In</button>
+      <button id="logout-btn" style="display: none">Log Out</button>
+      <a
+        id="profile-link"
+        href="profile.html"
+        style="display: none; margin-left: 10px"
+        >My Profile</a
+      >
+
+      <p id="auth-status"></p>
+    </div>
+
+    <div id="claim-section" style="display: none">
+      <form id="claim-form">
+        <label for="claim-text">Enter your claim</label>
+        <textarea
+          id="claim-text"
+          name="claim"
+          rows="4"
+          placeholder="Type the claim you want to verify..."
+          required
+        ></textarea>
+
+        <label for="claim-description">Description</label>
+        <textarea
+          id="claim-description"
+          name="description"
+          rows="4"
+          placeholder="Add more context or details about this claim..."
+          required
+        ></textarea>
+
+        <button type="submit">Submit Claim</button>
+      </form>
+    </div>
+
+    <div id="my-flies-section" style="display: none">
+      <h2>My Flies</h2>
+      <ul id="flies-list"></ul>
+    </div>
+
+    <p id="output"></p>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+      const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
+      const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY,
+      );
+
+      const authEmail = document.getElementById("auth-email");
+      const authPassword = document.getElementById("auth-password");
+      const authDisplayName = document.getElementById("auth-display-name");
+      const authStatus = document.getElementById("auth-status");
+      const signupBtn = document.getElementById("signup-btn");
+      const loginBtn = document.getElementById("login-btn");
+      const logoutBtn = document.getElementById("logout-btn");
+      const claimSection = document.getElementById("claim-section");
+      const form = document.getElementById("claim-form");
+      const output = document.getElementById("output");
+
+      async function loadMyFlies() {
+        const { data, error } = await supabaseClient
+          .from("flies")
+          .select("id, claim, description, created_at")
+          .order("created_at", { ascending: false });
+
+        const fliesList = document.getElementById("flies-list");
+        fliesList.innerHTML = "";
+
+        if (error) {
+          console.error("Error loading flies:", error);
+          return;
+        }
+
+        data.forEach((fly) => {
+          const li = document.createElement("li");
+          li.innerHTML = `<strong>${fly.claim}</strong><br>${fly.description}<br><small>${new Date(fly.created_at).toLocaleString()}</small>`;
+          fliesList.appendChild(li);
+        });
+      }
+
+      function updateAuthUI(session) {
+        if (session) {
+          claimSection.style.display = "block";
+          document.getElementById("my-flies-section").style.display = "block";
+          logoutBtn.style.display = "inline-block";
+          document.getElementById("profile-link").style.display =
+            "inline-block";
+          signupBtn.style.display = "none";
+          loginBtn.style.display = "none";
+          loadMyFlies();
+        } else {
+          claimSection.style.display = "none";
+          document.getElementById("my-flies-section").style.display = "none";
+          logoutBtn.style.display = "none";
+          document.getElementById("profile-link").style.display = "none";
+          signupBtn.style.display = "inline-block";
+          loginBtn.style.display = "inline-block";
+        }
+      }
+
+      signupBtn.addEventListener("click", async () => {
+        const { data, error } = await supabaseClient.auth.signUp({
+          email: authEmail.value,
+          password: authPassword.value,
+        });
+
+        if (error) {
+          authStatus.textContent = "Signup error: " + error.message;
+          return;
+        }
+
+        const { error: profileError } = await supabaseClient
+          .from("profiles")
+          .insert([{ id: data.user.id, display_name: authDisplayName.value }]);
+
+        if (profileError) {
+          authStatus.textContent =
+            "Signed up, but profile save failed: " + profileError.message;
+        } else {
+          authStatus.textContent = "Signed up! You're logged in.";
+        }
+      });
+
+      loginBtn.addEventListener("click", async () => {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: authEmail.value,
+          password: authPassword.value,
+        });
+        if (error) {
+          authStatus.textContent = "Login error: " + error.message;
+        } else {
+          authStatus.textContent = "Logged in!";
+        }
+      });
+
+      logoutBtn.addEventListener("click", async () => {
+        await supabaseClient.auth.signOut();
+        authStatus.textContent = "Logged out.";
+      });
+
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        updateAuthUI(session);
+      });
+
+      supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        updateAuthUI(session);
+      });
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const claimText = document.getElementById("claim-text").value;
+        const descriptionText =
+          document.getElementById("claim-description").value;
+
+        const {
+          data: { user },
+        } = await supabaseClient.auth.getUser();
+
+        const { data, error } = await supabaseClient
+          .from("flies")
+          .insert([
+            {
+              claim: claimText,
+              description: descriptionText,
+              user_id: user.id,
+            },
+          ])
+          .select();
+
+        if (error) {
+          console.error("Error saving Fly:", error);
+          output.textContent = "Something went wrong: " + error.message;
+        } else {
+          console.log("Saved Fly:", data);
+          output.textContent = "Fly saved! ID: " + data[0].id;
+          form.reset();
+          loadMyFlies();
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>It's Not That Deep — Edit Fly</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="back-link" href="profile.html">← Back to Profile</a>
+
+    <h1>Edit Fly</h1>
+
+    <form id="edit-form">
+      <label for="claim-text">Claim</label>
+      <textarea id="claim-text" rows="3" required></textarea>
+
+      <label for="description-text">Description</label>
+      <textarea id="description-text" rows="4" required></textarea>
+
+      <button type="submit">Save Changes</button>
+    </form>
+
+    <p id="output"></p>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
+      const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY,
+      );
+
+      const params = new URLSearchParams(window.location.search);
+      const flyId = params.get("id");
+
+      const form = document.getElementById("edit-form");
+      const claimText = document.getElementById("claim-text");
+      const descriptionText = document.getElementById("description-text");
+      const output = document.getElementById("output");
+
+      async function loadFly() {
+        const {
+          data: { session },
+        } = await supabaseClient.auth.getSession();
+
+        if (!session) {
+          window.location.href = "V1.html";
+          return;
+        }
+
+        if (!flyId) {
+          output.textContent = "No Fly ID provided.";
+          return;
+        }
+
+        const { data, error } = await supabaseClient
+          .from("flies")
+          .select("claim, description")
+          .eq("id", flyId)
+          .single();
+
+        if (error) {
+          output.textContent = "Error loading Fly: " + error.message;
+          return;
+        }
+
+        claimText.value = data.claim;
+        descriptionText.value = data.description;
+      }
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const { error } = await supabaseClient
+          .from("flies")
+          .update({
+            claim: claimText.value,
+            description: descriptionText.value,
+          })
+          .eq("id", flyId);
+
+        if (error) {
+          output.textContent = "Error saving: " + error.message;
+        } else {
+          output.textContent = "Saved!";
+        }
+      });
+
+      loadFly();
+    </script>
+  </body>
+</html>
