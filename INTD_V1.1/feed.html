@@ -56,7 +56,12 @@
                     imageHtml = `<img src="${publicUrlData.publicUrl}" alt="Evidence photo" />`;
                 }
 
-                div.innerHTML = `${imageHtml}<p class="feed-claim">${fly.claim}</p>`;
+                div.innerHTML = `
+                <a href="fly.html?id=${fly.id}" class="fly-link">
+                    ${imageHtml}
+                    <p class="feed-claim">${fly.claim}</p>
+                </a>
+                `;
                 feedList.appendChild(div);
             });
         }
