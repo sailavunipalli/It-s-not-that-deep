@@ -135,6 +135,33 @@ a.back-link {
   background-color: #c76f65;
 }
 
+.password-wrapper {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.password-wrapper input {
+  margin-bottom: 0;
+  padding-right: 40px;
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  margin: 0;
+}
+
+.toggle-password-btn:hover {
+  background: none;
+}
+
 ul {
   list-style: none;
   padding: 0;

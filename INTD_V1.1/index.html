@@ -27,7 +27,10 @@
       <input type="email" id="auth-email" placeholder="you@example.com" />
 
       <label for="auth-password">Password</label>
-      <input type="password" id="auth-password" placeholder="Password" />
+      <div class="password-wrapper">
+        <input type="password" id="auth-password" placeholder="Password" />
+        <button type="button" id="toggle-password" class="toggle-password-btn">👁️</button>
+      </div>
 
       <button id="signup-btn">Sign Up</button>
       <button id="login-btn">Log In</button>
@@ -226,6 +229,12 @@
       updateAuthUI(session);
     });
 
+    togglePasswordBtn.addEventListener("click", () => {
+      const isHidden = authPassword.type === "password";
+      authPassword.type = isHidden ? "text" : "password";
+      togglePasswordBtn.textContent = isHidden ? "🙈" : "👁️";
+    });
+
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
 
@@ -236,6 +245,7 @@
       const conclusionText = document.getElementById("claim-conclusion").value;
       const impactText = document.getElementById("claim-impact").value;
       const imageFile = document.getElementById("claim-image").files[0];
+      const togglePasswordBtn = document.getElementById("toggle-password");
 
       const {
         data: { user },
