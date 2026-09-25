@@ -179,6 +179,19 @@ a.back-link {
   font-weight: 600;
 }
 
+.site-nav {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e8e3dc;
+}
+
+.site-nav a {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 ul {
   list-style: none;
   padding: 0;
