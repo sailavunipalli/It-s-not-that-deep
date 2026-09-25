@@ -126,6 +126,15 @@ a.back-link {
   margin-bottom: 16px;
 }
 
+.delete-btn {
+  background-color: #d9877e;
+  margin-top: 8px;
+}
+
+.delete-btn:hover {
+  background-color: #c76f65;
+}
+
 ul {
   list-style: none;
   padding: 0;

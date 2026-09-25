@@ -27,11 +27,32 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
+    const SUPABASE_ANON_KEY = "PAeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJISTE_YOUR_KEY_HERE";
     const supabaseClient = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_ANON_KEY,
     );
+
+    async function deleteFly(flyId, imagePath, listItem) {
+      const confirmed = confirm("Delete this Fly? This can't be undone.");
+      if (!confirmed) return;
+
+      const { error } = await supabaseClient
+        .from("flies")
+        .delete()
+        .eq("id", flyId);
+
+      if (error) {
+        alert("Error deleting Fly: " + error.message);
+        return;
+      }
+
+      if (imagePath) {
+        await supabaseClient.storage.from("evidence").remove([imagePath]);
+      }
+
+      listItem.remove();
+    }
 
     async function init() {
       const {
@@ -92,9 +113,18 @@
     ${fly.description}<br>
     <small>${new Date(fly.created_at).toLocaleString()}</small><br>
     <a href="edit.html?id=${fly.id}">Edit</a>
-  `;
+    <button class="delete-btn" data-id="${fly.id}" data-image="${fly.evidence_image_path || ""}">Delete</button>`;
         fliesList.appendChild(li);
       }
+
+      fliesList.addEventListener("click", function (e) {
+        if (e.target.classList.contains("delete-btn")) {
+          const flyId = e.target.dataset.id;
+          const imagePath = e.target.dataset.image;
+          const listItem = e.target.closest("li");
+          deleteFly(flyId, imagePath, listItem);
+        }
+      });
     }
 
     init();
