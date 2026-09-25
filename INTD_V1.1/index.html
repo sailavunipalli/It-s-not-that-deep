@@ -80,6 +80,7 @@
       );
 
       const authEmail = document.getElementById("auth-email");
+      const authForm = document.getElementById("auth-form");
       const authPassword = document.getElementById("auth-password");
       const authDisplayName = document.getElementById("auth-display-name");
       const authStatus = document.getElementById("auth-status");
@@ -112,24 +113,21 @@
       }
 
       function updateAuthUI(session) {
-        if (session) {
-          claimSection.style.display = "block";
-          document.getElementById("my-flies-section").style.display = "block";
-          logoutBtn.style.display = "inline-block";
-          document.getElementById("profile-link").style.display =
-            "inline-block";
-          signupBtn.style.display = "none";
-          loginBtn.style.display = "none";
-          loadMyFlies();
-        } else {
-          claimSection.style.display = "none";
-          document.getElementById("my-flies-section").style.display = "none";
-          logoutBtn.style.display = "none";
-          document.getElementById("profile-link").style.display = "none";
-          signupBtn.style.display = "inline-block";
-          loginBtn.style.display = "inline-block";
-        }
-      }
+  if (session) {
+    authForm.style.display = "none";
+    claimSection.style.display = "block";
+    document.getElementById("my-flies-section").style.display = "block";
+    logoutBtn.style.display = "inline-block";
+    document.getElementById("profile-link").style.display = "inline-block";
+    loadMyFlies();
+  } else {
+    authForm.style.display = "block";
+    claimSection.style.display = "none";
+    document.getElementById("my-flies-section").style.display = "none";
+    logoutBtn.style.display = "none";
+    document.getElementById("profile-link").style.display = "none";
+  }
+}
 
       signupBtn.addEventListener("click", async () => {
         const { data, error } = await supabaseClient.auth.signUp({
