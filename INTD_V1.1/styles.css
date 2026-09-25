@@ -85,6 +85,15 @@ a.back-link {
   color: #8a8580;
 }
 
+#recent-flies-section {
+  margin-bottom: 30px;
+}
+
+#recent-flies-list li {
+  font-size: 0.9rem;
+  padding: 10px 14px;
+}
+
 #auth-section {
   background-color: #ffffff;
   border: 1px solid #e8e3dc;
