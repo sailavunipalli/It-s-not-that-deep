@@ -223,10 +223,6 @@
       updateAuthUI(session);
     });
 
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-      updateAuthUI(session);
-    });
-
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
 
