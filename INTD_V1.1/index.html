@@ -52,6 +52,8 @@
       <label for="claim-evidence">Evidence (optional for now — links, sources, notes)</label>
       <textarea id="claim-evidence" name="evidence" rows="3"
         placeholder="Paste links, sources, or describe your evidence..."></textarea>
+      <label for="claim-image">Evidence Photo (optional)</label>
+      <input type="file" id="claim-image" accept="image/*" />
 
       <label for="claim-full-story">Full Story (optional for now)</label>
       <textarea id="claim-full-story" name="full_story" rows="5"
@@ -218,10 +220,27 @@
       const fullStoryText = document.getElementById("claim-full-story").value;
       const conclusionText = document.getElementById("claim-conclusion").value;
       const impactText = document.getElementById("claim-impact").value;
+      const imageFile = document.getElementById("claim-image").files[0];
 
       const {
         data: { user },
       } = await supabaseClient.auth.getUser();
+
+      let imagePath = null;
+
+      if (imageFile) {
+        const filePath = `${user.id}/${Date.now()}-${imageFile.name}`;
+        const { error: uploadError } = await supabaseClient.storage
+          .from("evidence")
+          .upload(filePath, imageFile);
+
+        if (uploadError) {
+          output.textContent = "Image upload failed: " + uploadError.message;
+          return;
+        }
+
+        imagePath = filePath;
+      }
 
       const { data, error } = await supabaseClient
         .from("flies")
@@ -233,6 +252,7 @@
             full_story: fullStoryText,
             conclusion: conclusionText,
             impact: impactText,
+            evidence_image_path: imagePath,
             user_id: user.id,
           },
         ])
