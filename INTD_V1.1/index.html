@@ -128,7 +128,7 @@
     async function loadMyFlies() {
       const { data, error } = await supabaseClient
         .from("flies")
-        .select("id, claim, description, created_at")
+        .select("id, claim, description, created_at, evidence_image_path")
         .order("created_at", { ascending: false });
 
       const fliesList = document.getElementById("flies-list");
@@ -139,11 +139,27 @@
         return;
       }
 
-      data.forEach((fly) => {
+      for (const fly of data) {
         const li = document.createElement("li");
-        li.innerHTML = `<strong>${fly.claim}</strong><br>${fly.description}<br><small>${new Date(fly.created_at).toLocaleString()}</small>`;
+
+        let imageHtml = "";
+        if (fly.evidence_image_path) {
+          const { data: signedData } = await supabaseClient.storage
+            .from("evidence")
+            .createSignedUrl(fly.evidence_image_path, 3600);
+          if (signedData) {
+            imageHtml = `<img src="${signedData.signedUrl}" class="fly-thumbnail" alt="Evidence photo" />`;
+          }
+        }
+
+        li.innerHTML = `
+      ${imageHtml}
+      <strong>${fly.claim}</strong><br>
+      ${fly.description}<br>
+      <small>${new Date(fly.created_at).toLocaleString()}</small>
+    `;
         fliesList.appendChild(li);
-      });
+      }
     }
 
     function updateAuthUI(session) {

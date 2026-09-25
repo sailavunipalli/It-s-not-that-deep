@@ -1,86 +1,104 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>It's Not That Deep — My Profile</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <a class="back-link" href="index.html">← Back to Submit</a>
 
-    <div id="profile-header">
-      <div id="avatar">
-        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>
-      </div>
-      <div id="display-name">Loading...</div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>It's Not That Deep — My Profile</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <a class="back-link" href="index.html">← Back to Submit</a>
+
+  <div id="profile-header">
+    <div id="avatar">
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
+      </svg>
     </div>
+    <div id="display-name">Loading...</div>
+  </div>
 
-    <h2>My Flies</h2>
-    <ul id="flies-list"></ul>
+  <h2>My Flies</h2>
+  <ul id="flies-list"></ul>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-      const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
-      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
-      const supabaseClient = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-      );
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY,
+    );
 
-      async function init() {
-        const {
-          data: { session },
-        } = await supabaseClient.auth.getSession();
+    async function init() {
+      const {
+        data: { session },
+      } = await supabaseClient.auth.getSession();
 
-        if (!session) {
-          window.location.href = "index.html";
-          return;
-        }
-
-        const user = session.user;
-
-        const { data: profile, error: profileError } = await supabaseClient
-          .from("profiles")
-          .select("display_name")
-          .eq("id", user.id)
-          .single();
-
-        document.getElementById("display-name").textContent = profileError
-          ? "Unknown user"
-          : profile.display_name;
-
-        const { data: flies, error: fliesError } = await supabaseClient
-          .from("flies")
-          .select("id, claim, description, created_at")
-          .order("created_at", { ascending: false });
-
-        const fliesList = document.getElementById("flies-list");
-        fliesList.innerHTML = "";
-
-        if (fliesError) {
-          fliesList.innerHTML = "<li>Error loading Flies.</li>";
-          return;
-        }
-
-        if (flies.length === 0) {
-          fliesList.innerHTML = "<li>No Flies yet.</li>";
-          return;
-        }
-
-        flies.forEach((fly) => {
-          const li = document.createElement("li");
-          li.innerHTML = `
-            <strong>${fly.claim}</strong><br>
-            ${fly.description}<br>
-            <small>${new Date(fly.created_at).toLocaleString()}</small><br>
-            <a href="edit.html?id=${fly.id}">Edit</a>
-          `;
-          fliesList.appendChild(li);
-        });
+      if (!session) {
+        window.location.href = "index.html";
+        return;
       }
 
-      init();
-    </script>
-  </body>
+      const user = session.user;
+
+      const { data: profile, error: profileError } = await supabaseClient
+        .from("profiles")
+        .select("display_name")
+        .eq("id", user.id)
+        .single();
+
+      document.getElementById("display-name").textContent = profileError
+        ? "Unknown user"
+        : profile.display_name;
+
+      const { data: flies, error: fliesError } = await supabaseClient
+        .from("flies")
+        .select("id, claim, description, created_at, evidence_image_path")
+        .order("created_at", { ascending: false });
+
+      const fliesList = document.getElementById("flies-list");
+      fliesList.innerHTML = "";
+
+      if (fliesError) {
+        fliesList.innerHTML = "<li>Error loading Flies.</li>";
+        return;
+      }
+
+      if (flies.length === 0) {
+        fliesList.innerHTML = "<li>No Flies yet.</li>";
+        return;
+      }
+
+      for (const fly of flies) {
+        const li = document.createElement("li");
+
+        let imageHtml = "";
+        if (fly.evidence_image_path) {
+          const { data: signedData } = await supabaseClient.storage
+            .from("evidence")
+            .createSignedUrl(fly.evidence_image_path, 3600);
+          if (signedData) {
+            imageHtml = `<img src="${signedData.signedUrl}" class="fly-thumbnail" alt="Evidence photo" />`;
+          }
+        }
+
+        li.innerHTML = `
+    ${imageHtml}
+    <strong>${fly.claim}</strong><br>
+    ${fly.description}<br>
+    <small>${new Date(fly.created_at).toLocaleString()}</small><br>
+    <a href="edit.html?id=${fly.id}">Edit</a>
+  `;
+        fliesList.appendChild(li);
+      }
+    }
+
+    init();
+  </script>
+</body>
+
 </html>

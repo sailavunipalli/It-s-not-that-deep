@@ -32,6 +32,9 @@
     <label for="impact-text">Impact — how this makes things better</label>
     <textarea id="impact-text" rows="3"></textarea>
 
+    <label>Current Evidence Photo</label>
+    <div id="current-image"></div>
+
     <button type="submit">Save Changes</button>
   </form>
 
@@ -75,7 +78,7 @@
 
       const { data, error } = await supabaseClient
         .from("flies")
-        .select("claim, description, evidence, full_story, conclusion, impact")
+        .select("claim, description, evidence, full_story, conclusion, impact, evidence_image_path")
         .eq("id", flyId)
         .single();
 
@@ -90,6 +93,16 @@
       fullStoryText.value = data.full_story || "";
       conclusionText.value = data.conclusion || "";
       impactText.value = data.impact || "";
+      
+      if (data.evidence_image_path) {
+        const { data: signedData } = await supabaseClient.storage
+          .from("evidence")
+          .createSignedUrl(data.evidence_image_path, 3600);
+        if (signedData) {
+          document.getElementById("current-image").innerHTML =
+            `<img src="${signedData.signedUrl}" class="fly-thumbnail" alt="Evidence photo" />`;
+        }
+      }
     }
 
     form.addEventListener("submit", async function (e) {
