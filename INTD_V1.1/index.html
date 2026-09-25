@@ -1,209 +1,225 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>It's Not That Deep — Submit a Claim</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <h1>Submit a Claim</h1>
 
-    <div id="auth-section">
-  <div id="auth-form">
-    <h2>Login / Signup</h2>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>It's Not That Deep — Submit a Claim</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-    <label for="auth-display-name">Display Name (for signup only)</label>
-    <input type="text" id="auth-display-name" placeholder="Your name" />
+<body>
+  <h1>Submit a Claim</h1>
 
-    <label for="auth-email">Email</label>
-    <input type="email" id="auth-email" placeholder="you@example.com" />
+  <div id="auth-section">
+    <div id="auth-form">
+      <h2>Login / Signup</h2>
 
-    <label for="auth-password">Password</label>
-    <input type="password" id="auth-password" placeholder="Password" />
+      <label for="auth-display-name">Display Name (for signup only)</label>
+      <input type="text" id="auth-display-name" placeholder="Your name" />
 
-    <button id="signup-btn">Sign Up</button>
-    <button id="login-btn">Log In</button>
+      <label for="auth-email">Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" />
+
+      <label for="auth-password">Password</label>
+      <input type="password" id="auth-password" placeholder="Password" />
+
+      <button id="signup-btn">Sign Up</button>
+      <button id="login-btn">Log In</button>
+    </div>
+
+    <button id="logout-btn" style="display: none">Log Out</button>
+    <a id="profile-link" href="profile.html" style="display: none; margin-left: 10px">My Profile</a>
+
+    <p id="auth-status"></p>
   </div>
 
-  <button id="logout-btn" style="display: none">Log Out</button>
-  <a id="profile-link" href="profile.html" style="display: none; margin-left: 10px">My Profile</a>
+  <div id="claim-section" style="display: none">
+    <form id="claim-form">
+      <label for="claim-text">Claim</label>
+      <textarea id="claim-text" name="claim" rows="3" placeholder="State your claim clearly — this is the headline."
+        required></textarea>
 
-  <p id="auth-status"></p>
-</div>
+      <label for="claim-description">Description</label>
+      <textarea id="claim-description" name="description" rows="3"
+        placeholder="Add more context or details about this claim..." required></textarea>
 
-    <div id="claim-section" style="display: none">
-      <form id="claim-form">
-        <label for="claim-text">Enter your claim</label>
-        <textarea
-          id="claim-text"
-          name="claim"
-          rows="4"
-          placeholder="Type the claim you want to verify..."
-          required
-        ></textarea>
+      <label for="claim-evidence">Evidence (optional for now — links, sources, notes)</label>
+      <textarea id="claim-evidence" name="evidence" rows="3"
+        placeholder="Paste links, sources, or describe your evidence..."></textarea>
 
-        <label for="claim-description">Description</label>
-        <textarea
-          id="claim-description"
-          name="description"
-          rows="4"
-          placeholder="Add more context or details about this claim..."
-          required
-        ></textarea>
+      <label for="claim-full-story">Full Story (optional for now)</label>
+      <textarea id="claim-full-story" name="full_story" rows="5"
+        placeholder="Tell the full story defending this claim..."></textarea>
 
-        <button type="submit">Submit Claim</button>
-      </form>
-    </div>
+      <label for="claim-conclusion">Conclusion (optional for now)</label>
+      <textarea id="claim-conclusion" name="conclusion" rows="3"
+        placeholder="What do you conclude from this?"></textarea>
 
-    <div id="my-flies-section" style="display: none">
-      <h2>My Flies</h2>
-      <ul id="flies-list"></ul>
-    </div>
+      <label for="claim-impact">Impact — how this makes things better (optional for now)</label>
+      <textarea id="claim-impact" name="impact" rows="3"
+        placeholder="How does this change things / make the world better?"></textarea>
 
-    <p id="output"></p>
+      <button type="submit">Submit Claim</button>
+    </form>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <div id="my-flies-section" style="display: none">
+    <h2>My Flies</h2>
+    <ul id="flies-list"></ul>
+  </div>
 
-    <script>
-      const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
-      const SUPABASE_ANON_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
-      const supabaseClient = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-      );
+  <p id="output"></p>
 
-      const authEmail = document.getElementById("auth-email");
-      const authForm = document.getElementById("auth-form");
-      const authPassword = document.getElementById("auth-password");
-      const authDisplayName = document.getElementById("auth-display-name");
-      const authStatus = document.getElementById("auth-status");
-      const signupBtn = document.getElementById("signup-btn");
-      const loginBtn = document.getElementById("login-btn");
-      const logoutBtn = document.getElementById("logout-btn");
-      const claimSection = document.getElementById("claim-section");
-      const form = document.getElementById("claim-form");
-      const output = document.getElementById("output");
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-      async function loadMyFlies() {
-        const { data, error } = await supabaseClient
-          .from("flies")
-          .select("id, claim, description, created_at")
-          .order("created_at", { ascending: false });
+  <script>
+    const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
+    const SUPABASE_ANON_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY,
+    );
 
-        const fliesList = document.getElementById("flies-list");
-        fliesList.innerHTML = "";
+    const authEmail = document.getElementById("auth-email");
+    const authForm = document.getElementById("auth-form");
+    const authPassword = document.getElementById("auth-password");
+    const authDisplayName = document.getElementById("auth-display-name");
+    const authStatus = document.getElementById("auth-status");
+    const signupBtn = document.getElementById("signup-btn");
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const claimSection = document.getElementById("claim-section");
+    const form = document.getElementById("claim-form");
+    const output = document.getElementById("output");
 
-        if (error) {
-          console.error("Error loading flies:", error);
-          return;
-        }
+    async function loadMyFlies() {
+      const { data, error } = await supabaseClient
+        .from("flies")
+        .select("id, claim, description, created_at")
+        .order("created_at", { ascending: false });
 
-        data.forEach((fly) => {
-          const li = document.createElement("li");
-          li.innerHTML = `<strong>${fly.claim}</strong><br>${fly.description}<br><small>${new Date(fly.created_at).toLocaleString()}</small>`;
-          fliesList.appendChild(li);
-        });
+      const fliesList = document.getElementById("flies-list");
+      fliesList.innerHTML = "";
+
+      if (error) {
+        console.error("Error loading flies:", error);
+        return;
       }
 
-      function updateAuthUI(session) {
-  if (session) {
-    authForm.style.display = "none";
-    claimSection.style.display = "block";
-    document.getElementById("my-flies-section").style.display = "block";
-    logoutBtn.style.display = "inline-block";
-    document.getElementById("profile-link").style.display = "inline-block";
-    loadMyFlies();
-  } else {
-    authForm.style.display = "block";
-    claimSection.style.display = "none";
-    document.getElementById("my-flies-section").style.display = "none";
-    logoutBtn.style.display = "none";
-    document.getElementById("profile-link").style.display = "none";
-  }
-}
+      data.forEach((fly) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${fly.claim}</strong><br>${fly.description}<br><small>${new Date(fly.created_at).toLocaleString()}</small>`;
+        fliesList.appendChild(li);
+      });
+    }
 
-      signupBtn.addEventListener("click", async () => {
-        const { data, error } = await supabaseClient.auth.signUp({
-          email: authEmail.value,
-          password: authPassword.value,
-        });
+    function updateAuthUI(session) {
+      if (session) {
+        authForm.style.display = "none";
+        claimSection.style.display = "block";
+        document.getElementById("my-flies-section").style.display = "block";
+        logoutBtn.style.display = "inline-block";
+        document.getElementById("profile-link").style.display = "inline-block";
+        loadMyFlies();
+      } else {
+        authForm.style.display = "block";
+        claimSection.style.display = "none";
+        document.getElementById("my-flies-section").style.display = "none";
+        logoutBtn.style.display = "none";
+        document.getElementById("profile-link").style.display = "none";
+      }
+    }
 
-        if (error) {
-          authStatus.textContent = "Signup error: " + error.message;
-          return;
-        }
-
-        const { error: profileError } = await supabaseClient
-          .from("profiles")
-          .insert([{ id: data.user.id, display_name: authDisplayName.value }]);
-
-        if (profileError) {
-          authStatus.textContent =
-            "Signed up, but profile save failed: " + profileError.message;
-        } else {
-          authStatus.textContent = "Signed up! You're logged in.";
-        }
+    signupBtn.addEventListener("click", async () => {
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: authEmail.value,
+        password: authPassword.value,
       });
 
-      loginBtn.addEventListener("click", async () => {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-          email: authEmail.value,
-          password: authPassword.value,
-        });
-        if (error) {
-          authStatus.textContent = "Login error: " + error.message;
-        } else {
-          authStatus.textContent = "Logged in!";
-        }
+      if (error) {
+        authStatus.textContent = "Signup error: " + error.message;
+        return;
+      }
+
+      const { error: profileError } = await supabaseClient
+        .from("profiles")
+        .insert([{ id: data.user.id, display_name: authDisplayName.value }]);
+
+      if (profileError) {
+        authStatus.textContent =
+          "Signed up, but profile save failed: " + profileError.message;
+      } else {
+        authStatus.textContent = "Signed up! You're logged in.";
+      }
+    });
+
+    loginBtn.addEventListener("click", async () => {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: authEmail.value,
+        password: authPassword.value,
       });
+      if (error) {
+        authStatus.textContent = "Login error: " + error.message;
+      } else {
+        authStatus.textContent = "Logged in!";
+      }
+    });
 
-      logoutBtn.addEventListener("click", async () => {
-        await supabaseClient.auth.signOut();
-        authStatus.textContent = "Logged out.";
-      });
+    logoutBtn.addEventListener("click", async () => {
+      await supabaseClient.auth.signOut();
+      authStatus.textContent = "Logged out.";
+    });
 
-      supabaseClient.auth.onAuthStateChange((event, session) => {
-        updateAuthUI(session);
-      });
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      updateAuthUI(session);
+    });
 
-      supabaseClient.auth.getSession().then(({ data: { session } }) => {
-        updateAuthUI(session);
-      });
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+      updateAuthUI(session);
+    });
 
-      form.addEventListener("submit", async function (e) {
-        e.preventDefault();
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-        const claimText = document.getElementById("claim-text").value;
-        const descriptionText =
-          document.getElementById("claim-description").value;
+      const claimText = document.getElementById("claim-text").value;
+      const descriptionText = document.getElementById("claim-description").value;
+      const evidenceText = document.getElementById("claim-evidence").value;
+      const fullStoryText = document.getElementById("claim-full-story").value;
+      const conclusionText = document.getElementById("claim-conclusion").value;
+      const impactText = document.getElementById("claim-impact").value;
 
-        const {
-          data: { user },
-        } = await supabaseClient.auth.getUser();
+      const {
+        data: { user },
+      } = await supabaseClient.auth.getUser();
 
-        const { data, error } = await supabaseClient
-          .from("flies")
-          .insert([
-            {
-              claim: claimText,
-              description: descriptionText,
-              user_id: user.id,
-            },
-          ])
-          .select();
+      const { data, error } = await supabaseClient
+        .from("flies")
+        .insert([
+          {
+            claim: claimText,
+            description: descriptionText,
+            evidence: evidenceText,
+            full_story: fullStoryText,
+            conclusion: conclusionText,
+            impact: impactText,
+            user_id: user.id,
+          },
+        ])
+        .select();
 
-        if (error) {
-          console.error("Error saving Fly:", error);
-          output.textContent = "Something went wrong: " + error.message;
-        } else {
-          console.log("Saved Fly:", data);
-          output.textContent = "Fly saved! ID: " + data[0].id;
-          form.reset();
-          loadMyFlies();
-        }
-      });
-    </script>
-  </body>
+      if (error) {
+        console.error("Error saving Fly:", error);
+        output.textContent = "Something went wrong: " + error.message;
+      } else {
+        console.log("Saved Fly:", data);
+        output.textContent = "Fly saved! ID: " + data[0].id;
+        form.reset();
+        loadMyFlies();
+      }
+    });
+  </script>
+</body>
+
 </html>
