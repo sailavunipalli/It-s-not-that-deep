@@ -1,89 +1,257 @@
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
 }
 
+:root {
+  /* =========================
+     PRIMARY PALETTE
+     ========================= */
+
+  --rich-black: #001b1a;
+  --dark-green: #032221;
+  --bangladesh-green: #03624c;
+  --mountain-meadow: #2cc295;
+  --caribbean-green: #00df81;
+  --anti-flash-white: #f1f7f6;
+
+  /* =========================
+     SECONDARY PALETTE
+     ========================= */
+
+  --pine: #06302b;
+  --basil: #0b453a;
+  --forest: #095544;
+  --frog: #17876d;
+  --mint: #2fa98c;
+  --stone: #707d7d;
+  --pistachio: #aacbc4;
+
+  /* =========================
+     UI TOKENS
+     ========================= */
+
+  --background: var(--rich-black);
+  --surface: var(--dark-green);
+  --surface-2: var(--pine);
+  --surface-3: var(--basil);
+
+  --text: var(--anti-flash-white);
+  --text-secondary: var(--pistachio);
+  --text-muted: var(--stone);
+
+  --accent: var(--caribbean-green);
+  --accent-hover: var(--mountain-meadow);
+  --accent-soft: var(--frog);
+
+  --border: rgba(170, 203, 196, 0.14);
+  --border-hover: rgba(44, 194, 149, 0.35);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background-color: #faf8f5;
-  color: #3a3a3a;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  background-color: var(--background);
+  color: var(--text);
+
   max-width: 600px;
   margin: 40px auto;
   padding: 0 20px;
+
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
+
+/* =========================
+   TYPOGRAPHY
+   ========================= */
 
 h1 {
   font-size: 1.6rem;
+  line-height: 1.2;
   font-weight: 600;
+  letter-spacing: -0.025em;
   margin-bottom: 24px;
+  color: var(--text);
 }
 
 h2 {
   font-size: 1.1rem;
+  line-height: 1.3;
   font-weight: 600;
+  letter-spacing: -0.015em;
   margin-bottom: 12px;
-  color: #3a3a3a;
+  color: var(--text);
 }
 
 label {
   display: block;
   margin-bottom: 6px;
+
   font-weight: 500;
   font-size: 0.9rem;
-  color: #6b6560;
+
+  color: var(--text-secondary);
 }
+
+/* =========================
+   INPUTS
+   ========================= */
 
 input,
 textarea {
   width: 100%;
+
   padding: 10px 12px;
+
   font-size: 0.95rem;
   font-family: inherit;
-  border: 1px solid #e8e3dc;
-  border-radius: 6px;
-  background-color: #ffffff;
-  color: #3a3a3a;
+
+  color: var(--text);
+  background-color: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+
   margin-bottom: 16px;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--stone);
+}
+
+input:hover,
+textarea:hover {
+  border-color: rgba(170, 203, 196, 0.22);
 }
 
 input:focus,
 textarea:focus {
   outline: none;
-  border-color: #8fa890;
+
+  border-color: var(--accent);
+
+  background-color: var(--surface-2);
+
+  box-shadow: 0 0 0 2px rgba(0, 223, 129, 0.08);
 }
+
+/* =========================
+   BUTTONS
+   ========================= */
 
 button {
   padding: 10px 18px;
+
   font-size: 0.9rem;
   font-weight: 500;
   font-family: inherit;
-  border: none;
-  border-radius: 6px;
-  background-color: #8fa890;
-  color: #ffffff;
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+
+  background-color: var(--accent);
+  color: var(--rich-black);
+
   cursor: pointer;
+
   margin-right: 8px;
+
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease,
+    box-shadow 150ms ease;
 }
 
 button:hover {
-  background-color: #7d9a7e;
+  background-color: var(--accent-hover);
+
+  box-shadow: 0 4px 18px rgba(0, 223, 129, 0.12);
 }
 
+button:active {
+  transform: translateY(1px);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =========================
+   LINKS
+   ========================= */
+
 a {
-  color: #8fa890;
+  color: var(--mountain-meadow);
   text-decoration: none;
+
+  transition: color 150ms ease;
 }
 
 a:hover {
-  text-decoration: underline;
+  color: var(--caribbean-green);
+  text-decoration: none;
 }
 
 a.back-link {
   display: inline-block;
+
   margin-bottom: 20px;
+
   font-size: 0.9rem;
-  color: #8a8580;
+  color: var(--text-muted);
 }
+
+a.back-link:hover {
+  color: var(--text-secondary);
+}
+
+/* =========================
+   RECENT FLIES
+   ========================= */
 
 #recent-flies-section {
   margin-bottom: 30px;
@@ -94,46 +262,85 @@ a.back-link {
   padding: 10px 14px;
 }
 
+/* =========================
+   AUTH
+   ========================= */
+
 #auth-section {
-  background-color: #ffffff;
-  border: 1px solid #e8e3dc;
-  border-radius: 8px;
+  background-color: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
   padding: 20px;
   margin-bottom: 24px;
 }
 
 #output {
   font-size: 0.9rem;
-  color: #6b6560;
+  color: var(--text-muted);
 }
+
+/* =========================
+   FLY THUMBNAIL
+   ========================= */
 
 .fly-thumbnail {
   width: 60px;
   height: 60px;
+
   object-fit: cover;
-  border-radius: 6px;
+
+  border-radius: var(--radius-sm);
+
   display: block;
   margin-bottom: 8px;
+
+  border: 1px solid var(--border);
 }
 
+/* =========================
+   INFO NOTE
+   ========================= */
+
 .info-note {
-  background-color: #f0f4ef;
-  border-left: 3px solid #8fa890;
-  border-radius: 4px;
+  background-color: var(--pine);
+
+  border-left: 3px solid var(--mountain-meadow);
+
+  border-radius: var(--radius-sm);
+
   padding: 10px 14px;
+
   font-size: 0.85rem;
-  color: #5a6b5c;
+  color: var(--pistachio);
+
   margin-bottom: 16px;
 }
 
+/* =========================
+   DELETE BUTTON
+   ========================= */
+
 .delete-btn {
-  background-color: #d9877e;
+  background-color: var(--surface-3);
+  color: var(--pistachio);
+
+  border: 1px solid rgba(170, 203, 196, 0.15);
+
   margin-top: 8px;
 }
 
 .delete-btn:hover {
-  background-color: #c76f65;
+  background-color: var(--forest);
+  color: var(--anti-flash-white);
+
+  box-shadow: none;
 }
+
+/* =========================
+   PASSWORD
+   ========================= */
 
 .password-wrapper {
   position: relative;
@@ -147,20 +354,36 @@ a.back-link {
 
 .toggle-password-btn {
   position: absolute;
+
   right: 6px;
   top: 50%;
+
   transform: translateY(-50%);
-  background: none;
+
+  background: transparent;
+  color: var(--stone);
+
   border: none;
+
   font-size: 1rem;
+
   cursor: pointer;
+
   padding: 4px 8px;
   margin: 0;
+
+  box-shadow: none;
 }
 
 .toggle-password-btn:hover {
-  background: none;
+  background: transparent;
+  color: var(--mint);
+  box-shadow: none;
 }
+
+/* =========================
+   FEED
+   ========================= */
 
 .feed-item {
   margin-bottom: 20px;
@@ -169,28 +392,54 @@ a.back-link {
 .feed-item img {
   width: 100%;
   max-height: 300px;
+
   object-fit: cover;
-  border-radius: 8px;
+
+  border-radius: var(--radius-md);
+
   margin-bottom: 8px;
+
+  border: 1px solid var(--border);
 }
 
 .feed-item .feed-claim {
   font-size: 1rem;
   font-weight: 600;
+  color: var(--text);
+
+  letter-spacing: -0.01em;
 }
+
+/* =========================
+   SITE NAVIGATION
+   ========================= */
 
 .site-nav {
   display: flex;
   gap: 16px;
+
   padding-bottom: 16px;
   margin-bottom: 20px;
-  border-bottom: 1px solid #e8e3dc;
+
+  border-bottom: 1px solid var(--border);
 }
 
 .site-nav a {
   font-size: 0.9rem;
   font-weight: 500;
+
+  color: var(--text-muted);
+
+  transition: color 150ms ease;
 }
+
+.site-nav a:hover {
+  color: var(--accent);
+}
+
+/* =========================
+   LISTS
+   ========================= */
 
 ul {
   list-style: none;
@@ -198,48 +447,77 @@ ul {
 }
 
 li {
-  background-color: #ffffff;
-  border: 1px solid #e8e3dc;
-  border-radius: 8px;
+  background-color: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
   padding: 14px;
   margin-bottom: 10px;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+
+li:hover {
+  background-color: var(--surface-2);
+  border-color: var(--border-hover);
 }
 
 li strong {
   font-size: 1rem;
-  color: #3a3a3a;
+  font-weight: 500;
+  color: var(--text);
 }
 
 li small {
-  color: #8a8580;
+  color: var(--text-muted);
   font-size: 0.8rem;
 }
+
+/* =========================
+   PROFILE
+   ========================= */
 
 #profile-header {
   display: flex;
   align-items: center;
+
   gap: 16px;
+
   margin-bottom: 30px;
 }
 
 #avatar {
   width: 56px;
   height: 56px;
+
   border-radius: 50%;
-  background-color: #e8e3dc;
+
+  background-color: var(--basil);
+
+  border: 1px solid var(--border);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   flex-shrink: 0;
 }
 
 #avatar svg {
   width: 30px;
   height: 30px;
-  fill: #8a8580;
+
+  fill: var(--mint);
 }
 
 #display-name {
   font-size: 1.2rem;
   font-weight: 600;
+
+  letter-spacing: -0.02em;
+
+  color: var(--text);
 }
