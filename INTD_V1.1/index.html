@@ -131,11 +131,17 @@
 
     loadRecentFlies();
 
+    let fliesLoadToken = 0;
+
     async function loadMyFlies() {
+      const myToken = ++fliesLoadToken;
+
       const { data, error } = await supabaseClient
         .from("flies")
         .select("id, claim, description, created_at, evidence_image_path")
         .order("created_at", { ascending: false });
+
+      if (myToken !== fliesLoadToken) return;
 
       const fliesList = document.getElementById("flies-list");
       fliesList.innerHTML = "";
@@ -146,6 +152,8 @@
       }
 
       for (const fly of data) {
+        if (myToken !== fliesLoadToken) return;
+
         const li = document.createElement("li");
 
         let imageHtml = "";
