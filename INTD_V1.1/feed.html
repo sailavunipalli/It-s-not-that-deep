@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>It's Not That Deep — Feed</title>
+    <link rel="stylesheet" href="styles.css?v=2" />
+</head>
+
+<body>
+    <a class="back-link" href="index.html">← Back</a>
+
+    <h1>Feed</h1>
+
+    <div id="feed-list"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
+        const supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY,
+        );
+
+        async function loadFeed() {
+            const { data, error } = await supabaseClient.rpc("get_public_flies");
+
+            const feedList = document.getElementById("feed-list");
+            feedList.innerHTML = "";
+
+            if (error) {
+                feedList.innerHTML = "<p>Error loading feed: " + error.message + "</p>";
+                return;
+            }
+
+            if (data.length === 0) {
+                feedList.innerHTML = "<p>No published Flies yet.</p>";
+                return;
+            }
+
+            data.forEach((fly) => {
+                const div = document.createElement("div");
+                div.className = "feed-item";
+
+                let imageHtml = "";
+                if (fly.evidence_image_path) {
+                    const { data: publicUrlData } = supabaseClient.storage
+                        .from("evidence")
+                        .getPublicUrl(fly.evidence_image_path);
+                    imageHtml = `<img src="${publicUrlData.publicUrl}" alt="Evidence photo" />`;
+                }
+
+                div.innerHTML = `${imageHtml}<p class="feed-claim">${fly.claim}</p>`;
+                feedList.appendChild(div);
+            });
+        }
+
+        loadFeed();
+    </script>
+</body>
+
+</html>

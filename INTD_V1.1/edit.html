@@ -39,6 +39,7 @@
     <textarea id="impact-text" rows="3"></textarea>
 
     <button type="submit">Save Changes</button>
+    <button type="button" id="publish-btn">Publish Fly</button>
   </form>
 
   <p id="output"></p>
@@ -158,6 +159,32 @@
         output.textContent = "Error saving: " + error.message;
       } else {
         output.textContent = "Saved!";
+      }
+    });
+
+    document.getElementById("publish-btn").addEventListener("click", async () => {
+      const allFilled =
+        claimText.value.trim() &&
+        descriptionText.value.trim() &&
+        evidenceText.value.trim() &&
+        fullStoryText.value.trim() &&
+        conclusionText.value.trim() &&
+        impactText.value.trim();
+
+      if (!allFilled) {
+        output.textContent = "Fill in all five sections before publishing.";
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from("flies")
+        .update({ published: true })
+        .eq("id", flyId);
+
+      if (error) {
+        output.textContent = "Error publishing: " + error.message;
+      } else {
+        output.textContent = "Published! This Fly is now visible on the public Feed.";
       }
     });
 
