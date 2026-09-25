@@ -23,6 +23,12 @@
     <label for="evidence-text">Evidence (links, sources, notes)</label>
     <textarea id="evidence-text" rows="3"></textarea>
 
+    <label>Current Evidence Photo</label>
+    <div id="current-image"></div>
+
+    <label for="claim-image">Replace Evidence Photo (optional)</label>
+    <input type="file" id="claim-image" accept="image/*" />
+
     <label for="full-story-text">Full Story</label>
     <textarea id="full-story-text" rows="5"></textarea>
 
@@ -31,9 +37,6 @@
 
     <label for="impact-text">Impact — how this makes things better</label>
     <textarea id="impact-text" rows="3"></textarea>
-
-    <label>Current Evidence Photo</label>
-    <div id="current-image"></div>
 
     <button type="submit">Save Changes</button>
   </form>
@@ -61,6 +64,9 @@
     const impactText = document.getElementById("impact-text");
     const output = document.getElementById("output");
 
+    let currentImagePath = null;
+    let currentUserId = null;
+
     async function loadFly() {
       const {
         data: { session },
@@ -70,6 +76,8 @@
         window.location.href = "index.html";
         return;
       }
+
+      currentUserId = session.user.id;
 
       if (!flyId) {
         output.textContent = "No Fly ID provided.";
@@ -93,20 +101,45 @@
       fullStoryText.value = data.full_story || "";
       conclusionText.value = data.conclusion || "";
       impactText.value = data.impact || "";
-      
-      if (data.evidence_image_path) {
+
+      currentImagePath = data.evidence_image_path || null;
+
+      if (currentImagePath) {
         const { data: signedData } = await supabaseClient.storage
           .from("evidence")
-          .createSignedUrl(data.evidence_image_path, 3600);
+          .createSignedUrl(currentImagePath, 3600);
         if (signedData) {
           document.getElementById("current-image").innerHTML =
             `<img src="${signedData.signedUrl}" class="fly-thumbnail" alt="Evidence photo" />`;
         }
+      } else {
+        document.getElementById("current-image").textContent = "No photo attached.";
       }
     }
 
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
+
+      const newImageFile = document.getElementById("claim-image").files[0];
+      let imagePath = currentImagePath;
+
+      if (newImageFile) {
+        const filePath = `${currentUserId}/${Date.now()}-${newImageFile.name}`;
+        const { error: uploadError } = await supabaseClient.storage
+          .from("evidence")
+          .upload(filePath, newImageFile);
+
+        if (uploadError) {
+          output.textContent = "Image upload failed: " + uploadError.message;
+          return;
+        }
+
+        if (currentImagePath) {
+          await supabaseClient.storage.from("evidence").remove([currentImagePath]);
+        }
+
+        imagePath = filePath;
+      }
 
       const { error } = await supabaseClient
         .from("flies")
@@ -117,6 +150,7 @@
           full_story: fullStoryText.value,
           conclusion: conclusionText.value,
           impact: impactText.value,
+          evidence_image_path: imagePath,
         })
         .eq("id", flyId);
 
