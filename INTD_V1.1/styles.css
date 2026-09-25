@@ -116,6 +116,16 @@ a.back-link {
   margin-bottom: 8px;
 }
 
+.info-note {
+  background-color: #f0f4ef;
+  border-left: 3px solid #8fa890;
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: #5a6b5c;
+  margin-bottom: 16px;
+}
+
 ul {
   list-style: none;
   padding: 0;
