@@ -419,6 +419,27 @@ a.back-link:hover {
   color: inherit;
 }
 
+.fly-page {
+  margin-top: 20px;
+}
+
+.fly-section {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.fly-section h2 {
+  margin-bottom: 10px;
+  color: var(--accent);
+}
+
+.fly-section p {
+  margin: 0;
+  white-space: pre-wrap;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
 /* =========================
    SITE NAVIGATION
    ========================= */
@@ -529,4 +550,29 @@ li small {
   letter-spacing: -0.02em;
 
   color: var(--text);
+}
+
+/* =========================
+   FLY PAGE
+   ========================= */
+
+.fly-page {
+  margin-top: 20px;
+}
+
+.fly-section {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.fly-section h2 {
+  margin-bottom: 10px;
+  color: var(--accent);
+}
+
+.fly-section p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  white-space: pre-wrap;
 }

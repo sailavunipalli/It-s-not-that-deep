@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>It's Not That Deep — Fly</title>
+    <link rel="stylesheet" href="styles.css?v=2" />
+</head>
+
+<body>
+
+    <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="feed.html">Feed</a>
+        <a href="profile.html">Profile</a>
+    </nav>
+
+    <a href="feed.html" class="back-link">← Back to Feed</a>
+
+    <main id="fly-container">
+        <p>Loading Fly...</p>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
+
+        const supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY,
+        );
+
+        async function loadFly() {
+            const params = new URLSearchParams(window.location.search);
+            const flyId = params.get("id");
+
+            const container = document.getElementById("fly-container");
+
+            if (!flyId) {
+                container.innerHTML = "<p>Fly not found.</p>";
+                return;
+            }
+
+            const { data, error } = await supabaseClient
+                .from("flies")
+                .select("*")
+                .eq("id", flyId)
+                .single();
+
+            if (error || !data) {
+                container.innerHTML = "<p>Fly not found.</p>";
+                return;
+            }
+
+            container.innerHTML = `
+                <article class="fly-page">
+
+                    <section class="fly-section">
+                        <h2>Claim</h2>
+                        <p>${data.claim || ""}</p>
+                    </section>
+
+                    <section class="fly-section">
+                        <h2>Description</h2>
+                        <p>${data.description || ""}</p>
+                    </section>
+
+                    <section class="fly-section">
+                        <h2>Evidence</h2>
+                        <p>${data.evidence || ""}</p>
+                    </section>
+
+                    <section class="fly-section">
+                        <h2>Full Story</h2>
+                        <p>${data.full_story || ""}</p>
+                    </section>
+
+                    <section class="fly-section">
+                        <h2>Conclusion</h2>
+                        <p>${data.conclusion || ""}</p>
+                    </section>
+
+                    <section class="fly-section">
+                        <h2>Impact</h2>
+                        <p>${data.impact || ""}</p>
+                    </section>
+
+                </article>
+            `;
+        }
+
+        loadFly();
+    </script>
+
+</body>
+
+</html>
