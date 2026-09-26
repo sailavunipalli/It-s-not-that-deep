@@ -45,9 +45,7 @@
             }
 
             const { data, error } = await supabaseClient
-                .from("flies")
-                .select("*")
-                .eq("id", flyId)
+                .rpc("get_public_fly", { fly_id: flyId })
                 .single();
 
             if (error || !data) {
