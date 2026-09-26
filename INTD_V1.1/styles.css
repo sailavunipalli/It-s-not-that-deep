@@ -37,7 +37,7 @@ body {
   padding: 0 24px 80px;
   background: var(--bg);
   color: var(--text);
-  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
@@ -101,6 +101,18 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   text-transform: uppercase;
 }
 
+.text-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.error-text {
+  color: #ff5555;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
 /* =========================================================
    3. NAVIGATION
    ========================================================= */
@@ -113,7 +125,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   justify-content: space-between;
   width: min(100%, var(--page-width));
   min-height: 64px;
-  margin: 0 auto;
+  margin: 0 auto 32px auto;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
@@ -163,7 +175,12 @@ button, .primary-btn, .secondary-btn {
   transition: all 100ms linear;
 }
 
-.primary-btn, button:not(.secondary-btn):not(.toggle-password-btn):not(.fly-gallery-arrow):not(.lightbox-arrow):not(.lightbox-close) {
+button:disabled, .primary-btn:disabled, .secondary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primary-btn, button:not(.secondary-btn):not(.toggle-password-btn):not(.fly-gallery-arrow):not(.lightbox-arrow):not(.lightbox-close):not(.remove-image-btn):not(.remove-pending-btn):not(.fly-gallery-dot) {
   background: var(--text);
   color: var(--bg);
   border-color: var(--text);
@@ -177,9 +194,17 @@ button, .primary-btn, .secondary-btn {
 }
 .secondary-btn:hover { background: var(--surface-2); border-color: var(--border-hover); }
 
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
 label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   color: var(--text);
   font-size: 0.82rem;
   font-weight: 500;
@@ -202,63 +227,126 @@ input:focus, textarea:focus {
   border-color: var(--text);
 }
 
-.password-wrapper { position: relative; margin-bottom: 16px; }
-.password-wrapper input { padding-right: 60px; }
+/* Dropzone & File Uploads */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 150ms ease, background 150ms ease;
+}
 
-.toggle-password-btn {
+.dropzone:hover, .dropzone.dragover {
+  border-color: var(--text-muted);
+  background: var(--surface-2);
+}
+
+.dropzone-icon { font-size: 1.5rem; margin-bottom: 8px; }
+.dropzone-text { font-size: 0.88rem; font-weight: 500; }
+.dropzone-subtext { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; }
+.dropzone-status { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
+
+.fly-thumbnail {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+#existing-images, #pending-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.image-thumb-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.image-thumb-wrapper img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+}
+
+.remove-image-btn, .remove-pending-btn {
   position: absolute;
-  top: 50%; right: 5px;
-  transform: translateY(-50%);
-  background: transparent !important;
-  color: var(--text-dim) !important;
-  border: none;
-  font-size: 0.72rem;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  min-height: unset;
+  padding: 0;
+  background: #000;
+  color: #fff;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 1;
 }
 
 /* =========================================================
-   FIXED FEED CARDS & SPACING
+   5. FEED CARDS & LAYOUTS
    ========================================================= */
+.feed-header {
+  max-width: var(--content-width);
+  margin: 0 auto 32px auto;
+}
 
-/* Feed grid container with good spacing */
+.feed-intro {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+}
+
 .recent-flies-grid, 
 #flies-list, 
 .feed-grid, 
 #feed-list {
   display: flex;
   flex-direction: column;
-  gap: 24px; /* Generous spacing between cards */
-  max-width: 760px;
+  gap: 24px;
+  max-width: var(--content-width);
   margin: 0 auto;
+  padding: 0;
+  list-style: none;
 }
 
-/* Individual Card Styling */
-.recent-fly-card, 
-.my-fly-card, 
-.feed-card, 
-.feed-item,
-.fly-card {
+.feed-card, .my-fly-card {
   display: flex;
   flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  padding: 24px; /* Proper internal padding so content isn't cramped */
+  padding: 24px;
   overflow: hidden;
-  transition: border-color 150s ease, background-color 150ms ease;
+  transition: border-color 150ms ease, background-color 150ms ease;
 }
 
-.recent-fly-card:hover, 
-.my-fly-card:hover, 
-.feed-card:hover, 
-.fly-card:hover {
+.feed-card:hover, .my-fly-card:hover {
   border-color: var(--border-hover);
   background: var(--surface-2);
 }
 
-/* Card Metadata / Eyebrow */
-.recent-fly-card-meta,
-.feed-card-meta,
-.fly-card-header {
+.feed-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.feed-card-meta {
   margin-bottom: 12px;
   color: var(--text-muted);
   font-size: 0.72rem;
@@ -267,10 +355,7 @@ input:focus, textarea:focus {
   text-transform: uppercase;
 }
 
-/* Card Titles / Claims */
-.recent-fly-card h3,
-.feed-card-claim,
-.fly-card-claim {
+.feed-card-claim {
   margin: 0 0 12px 0;
   color: var(--text);
   font-size: clamp(1.1rem, 2vw, 1.35rem);
@@ -279,21 +364,14 @@ input:focus, textarea:focus {
   letter-spacing: -0.02em;
 }
 
-/* Card Paragraph / Description */
-.recent-fly-card p,
-.feed-card-description,
-.fly-card-description {
+.feed-card-description {
   margin: 0 0 20px 0;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-size: 0.92rem;
   line-height: 1.65;
 }
 
-/* Card Media / Images */
-.recent-fly-card img,
-.feed-card-image img,
-.fly-card-media img,
-.feed-item img {
+.feed-card-image img {
   width: 100%;
   max-height: 380px;
   object-fit: cover;
@@ -304,41 +382,158 @@ input:focus, textarea:focus {
   background: var(--surface-2);
 }
 
-/* Card Footer Actions Layout */
-.recent-fly-card-footer,
-.feed-card-footer,
-.fly-card-footer {
+.feed-card-read {
+  display: inline-block;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.feed-card-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
-  flex-wrap: wrap;
   padding-top: 16px;
   margin-top: auto;
   border-top: 1px solid var(--border);
 }
 
-/* Responsive adjustments for mobile */
-@media (max-width: 600px) {
-  .recent-flies-grid, 
-  #flies-list, 
-  .feed-grid, 
-  #feed-list {
-    gap: 16px;
-  }
-  
-  .recent-fly-card, 
-  .my-fly-card, 
-  .feed-card, 
-  .feed-item,
-  .fly-card {
-    padding: 16px; /* Slightly tighter padding on small screens */
-  }
+.feed-state {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--text-muted);
+}
+
+/* Profile User Block */
+.profile-header-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: var(--content-width);
+  margin: 0 auto 32px auto;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.profile-name {
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 /* =========================================================
-   6. LIGHTBOX & GALLERY
+   6. FLY DETAIL & GALLERY
    ========================================================= */
+.fly-wrapper { max-width: var(--content-width); }
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.back-link:hover { color: var(--text); }
+
+.fly-header { margin-bottom: 32px; }
+.fly-label { font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; }
+.fly-claim { margin-top: 8px; font-size: clamp(1.8rem, 3.5vw, 2.5rem); }
+.fly-meta { color: var(--text-dim); font-size: 0.85rem; }
+
+.fly-gallery {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  margin-bottom: 32px;
+  background: var(--surface);
+}
+
+.fly-gallery-track {
+  display: flex;
+  transition: transform 250ms ease-in-out;
+}
+
+.fly-gallery-track img {
+  min-width: 100%;
+  max-height: 480px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.fly-gallery-arrow {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
+}
+.fly-gallery-arrow.prev { left: 12px; }
+.fly-gallery-arrow.next { right: 12px; }
+
+.fly-gallery-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0,0,0,0.5);
+}
+
+.fly-gallery-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  min-height: unset;
+  border-radius: 50%;
+  background: var(--border-strong);
+  border: none;
+}
+.fly-gallery-dot.active { background: var(--text); }
+
+.fly-body { display: flex; flex-direction: column; gap: 32px; }
+
+.fly-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.fly-section-number {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+.fly-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+/* Lightbox */
 .lightbox-overlay {
   position: fixed; inset: 0;
   z-index: 1000;
@@ -349,7 +544,19 @@ input:focus, textarea:focus {
 }
 .lightbox-overlay.open { display: flex; }
 
-.lightbox-close, .lightbox-arrow, .fly-gallery-arrow {
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.lightbox-content img {
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+}
+
+.lightbox-close, .lightbox-arrow {
   position: absolute;
   display: flex; align-items: center; justify-content: center;
   background: #000000;
@@ -357,22 +564,23 @@ input:focus, textarea:focus {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   cursor: pointer;
+  z-index: 1001;
 }
-.lightbox-close { top: 12px; right: 12px; width: 36px; height: 36px; }
+
+.lightbox-close { top: -40px; right: 0; width: 36px; height: 36px; }
+.lightbox-arrow { top: 50%; transform: translateY(-50%); width: 40px; height: 40px; font-size: 1.5rem; }
+.lightbox-arrow.prev { left: -48px; }
+.lightbox-arrow.next { right: -48px; }
+.lightbox-counter { position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); color: var(--text-dim); font-size: 0.8rem; }
 
 /* =========================================================
    7. RESPONSIVE LAYOUTS
    ========================================================= */
-@media (max-width: 800px) {
-  .recent-flies-grid, #flies-list, .feed-grid, #feed-list {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 600px) {
   body { padding: 0 16px 64px; }
-  .hero-actions { flex-direction: column; width: 100%; }
-  .hero-actions .primary-btn, .hero-actions .secondary-btn { width: 100%; }
+  .feed-card, .my-fly-card { padding: 16px; }
+  .lightbox-arrow.prev { left: 8px; }
+  .lightbox-arrow.next { right: 8px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

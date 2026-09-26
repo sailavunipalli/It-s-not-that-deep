@@ -17,17 +17,22 @@
     </div>
   </nav>
 
-  <div id="profile-header">
-    <div id="avatar">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
-      </svg>
+  <main class="feed-page">
+    <div class="profile-header-card">
+      <div class="avatar-circle">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+          <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
+        </svg>
+      </div>
+      <div id="display-name" class="profile-name">Loading user profile...</div>
     </div>
-    <div id="display-name">Loading...</div>
-  </div>
 
-  <h2>My Flies</h2>
-  <ul id="flies-list"></ul>
+    <header class="feed-header">
+      <h2>My Flies</h2>
+    </header>
+
+    <section id="flies-list" class="recent-flies-grid"></section>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -45,8 +50,8 @@
         .replace(/'/g, "&#039;");
     }
 
-    async function deleteFly(flyId, imagePath, listItem) {
-      const confirmed = confirm("Delete this Fly? This can't be undone.");
+    async function deleteFly(flyId, imagePath, cardElement) {
+      const confirmed = confirm("Delete this Fly? This action cannot be undone.");
       if (!confirmed) return;
 
       const { error } = await supabaseClient.from("flies").delete().eq("id", flyId);
@@ -59,7 +64,7 @@
         await supabaseClient.storage.from("evidence").remove([imagePath]);
       }
 
-      listItem.remove();
+      cardElement.remove();
     }
 
     async function init() {
@@ -77,8 +82,8 @@
         .eq("id", user.id)
         .single();
 
-      document.getElementById("display-name").textContent = profileError
-        ? "Unknown user"
+      document.getElementById("display-name").textContent = profileError || !profile
+        ? user.email || "Author Profile"
         : profile.display_name;
 
       const { data: flies, error: fliesError } = await supabaseClient
@@ -90,17 +95,18 @@
       fliesList.innerHTML = "";
 
       if (fliesError) {
-        fliesList.innerHTML = `<li>Error loading Flies: ${escapeHtml(fliesError.message)}</li>`;
+        fliesList.innerHTML = `<div class="feed-state"><p>Error loading Flies: ${escapeHtml(fliesError.message)}</p></div>`;
         return;
       }
 
       if (flies.length === 0) {
-        fliesList.innerHTML = "<li>No Flies yet.</li>";
+        fliesList.innerHTML = `<div class="feed-state"><p>No Flies created yet.</p></div>`;
         return;
       }
 
       for (const fly of flies) {
-        const li = document.createElement("li");
+        const article = document.createElement("article");
+        article.className = "my-fly-card";
 
         let imageHtml = "";
         if (fly.evidence_image_path) {
@@ -108,26 +114,31 @@
             .from("evidence")
             .createSignedUrl(fly.evidence_image_path, 3600);
           if (signedData) {
-            imageHtml = `<img src="${signedData.signedUrl}" class="fly-thumbnail" alt="Evidence photo" />`;
+            imageHtml = `<div class="feed-card-image"><img src="${signedData.signedUrl}" alt="Evidence thumbnail" /></div>`;
           }
         }
 
-        li.innerHTML = `
+        article.innerHTML = `
           ${imageHtml}
-          <strong>${escapeHtml(fly.claim)}</strong><br>
-          ${escapeHtml(fly.description)}<br>
-          <small>${new Date(fly.created_at).toLocaleString()}</small><br>
-          <a href="edit.html?id=${fly.id}">Edit</a>
-          <button class="delete-btn" data-id="${fly.id}" data-image="${fly.evidence_image_path || ""}">Delete</button>`;
-        fliesList.appendChild(li);
+          <div class="feed-card-content">
+            <div class="feed-card-meta">CREATED ${new Date(fly.created_at).toLocaleDateString()}</div>
+            <h2 class="feed-card-claim">${escapeHtml(fly.claim)}</h2>
+            <p class="feed-card-description">${escapeHtml(fly.description)}</p>
+            <div class="feed-card-footer">
+              <a href="edit.html?id=${fly.id}" class="secondary-btn">Edit Fly</a>
+              <button type="button" class="secondary-btn delete-btn" data-id="${fly.id}" data-image="${fly.evidence_image_path || ""}">Delete</button>
+            </div>
+          </div>`;
+
+        fliesList.appendChild(article);
       }
 
       fliesList.addEventListener("click", function (e) {
         if (e.target.classList.contains("delete-btn")) {
           const flyId = e.target.dataset.id;
           const imagePath = e.target.dataset.image;
-          const listItem = e.target.closest("li");
-          deleteFly(flyId, imagePath, listItem);
+          const cardElement = e.target.closest("article");
+          deleteFly(flyId, imagePath, cardElement);
         }
       });
     }

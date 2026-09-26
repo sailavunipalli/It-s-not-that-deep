@@ -4,36 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTD — It's Not That Deep</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
 
   <!-- Site Navigation -->
-  <header class="site-nav">
-    <div class="nav-container" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 16px;">
-      <a href="index.html" class="nav-brand">INTD</a>
-      <nav class="nav-links">
-        <a href="index.html" class="active">Home</a>
-        <a href="create.html">+ Create Fly</a>
-        <a href="profile.html">Profile</a>
-      </nav>
+  <nav class="site-nav">
+    <a href="index.html" class="site-logo">INTD</a>
+    <div class="site-nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="feed.html">Feed</a>
+      <a href="profile.html">Profile</a>
     </div>
-  </header>
+  </nav>
 
-  <!-- Main Feed Page -->
+  <!-- Main Home Page -->
   <main class="feed-page">
     
-    <!-- Feed Header -->
-    <div class="feed-header">
-      <span class="eyebrow">Structured Truth Platform</span>
-      <h1>Public Feed</h1>
-      <p class="feed-intro">Claims backed by evidence. Explore public cases or sign in to start your own.</p>
-    </div>
+    <!-- Header -->
+    <header class="feed-header">
+      <p class="eyebrow">Structured Truth Platform</p>
+      <h1>Public Record</h1>
+      <p class="feed-intro">Claims backed by evidence and transparent reasoning. Read public cases or sign in to build your own.</p>
+    </header>
 
     <!-- Dynamic Feed Container -->
-    <div id="feed-container" class="recent-flies-grid">
-      <!-- JavaScript will inject initial 3-4 flies here -->
-    </div>
+    <section id="feed-container" class="recent-flies-grid" aria-live="polite">
+      <!-- JavaScript injects flies here -->
+    </section>
 
     <!-- Loading & End States -->
     <div id="feed-loader" class="feed-state" style="display: none;">
@@ -41,7 +39,7 @@
     </div>
 
     <div id="feed-end" class="feed-state" style="display: none;">
-      <p>🎉 You're all caught up! No more cases to load.</p>
+      <p> You're all caught up! No more public cases to show.</p>
     </div>
 
   </main>

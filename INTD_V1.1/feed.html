@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>It's Not That Deep — Explore Flies</title>
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
 
@@ -92,7 +92,7 @@
 
         const imageHtml = thumbnailUrl
           ? `<div class="feed-card-image"><img src="${thumbnailUrl}" alt="Evidence for: ${escapeHtml(fly.claim)}" loading="lazy" /></div>`
-          : `<div class="feed-card-image feed-card-no-image"><span>NO IMAGE</span></div>`;
+          : "";
 
         const formattedDate = fly.created_at
           ? new Date(fly.created_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
@@ -104,7 +104,7 @@
             <div class="feed-card-content">
               <div class="feed-card-meta">
                 <span>FLY</span>
-                ${formattedDate ? `<span>${formattedDate}</span>` : ""}
+                ${formattedDate ? ` • <span>${formattedDate}</span>` : ""}
               </div>
               <h2 class="feed-card-claim">${escapeHtml(fly.claim)}</h2>
               <p class="feed-card-description">${escapeHtml(truncateText(fly.description || "", 150))}</p>

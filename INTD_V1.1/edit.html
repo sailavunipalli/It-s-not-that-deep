@@ -17,60 +17,64 @@
     </div>
   </nav>
 
-  <h1>Edit Fly</h1>
+  <main class="fly-wrapper">
+    <h1>Edit Fly</h1>
 
-  <p id="progress-status"></p>
+    <p id="progress-status" class="eyebrow"></p>
 
-  <form id="edit-form">
-    <label for="claim-text">Claim</label>
-    <textarea id="claim-text" rows="3" required></textarea>
+    <form id="edit-form">
+      <label for="claim-text">Claim</label>
+      <textarea id="claim-text" rows="3" required></textarea>
 
-    <label for="description-text">Description</label>
-    <textarea id="description-text" rows="4" required></textarea>
+      <label for="description-text">Description</label>
+      <textarea id="description-text" rows="4" required></textarea>
 
-    <label for="evidence-text">Evidence (links, sources, notes)</label>
-    <textarea id="evidence-text" rows="3"></textarea>
+      <label for="evidence-text">Evidence (links, sources, notes)</label>
+      <textarea id="evidence-text" rows="3"></textarea>
 
-    <label>Current Evidence Photo</label>
-    <div id="current-image"></div>
+      <label>Current Evidence Photo</label>
+      <div id="current-image"></div>
 
-    <label>Replace Evidence Photo (optional)</label>
-    <div class="dropzone" id="claim-image-dropzone">
-      <div class="dropzone-icon">📎</div>
-      <div class="dropzone-text">Drag a photo here, or click to browse</div>
-      <div class="dropzone-subtext">Any image format, including iPhone photos</div>
-    </div>
-    <p class="dropzone-status" id="claim-image-status" style="display: none"></p>
-    <div id="claim-image-preview"></div>
-    <input type="file" id="claim-image" accept="image/*,.heic,.heif" style="display: none" />
+      <label>Replace Evidence Photo (optional)</label>
+      <div class="dropzone" id="claim-image-dropzone">
+        <div class="dropzone-icon">📎</div>
+        <div class="dropzone-text">Drag a photo here, or click to browse</div>
+        <div class="dropzone-subtext">Any image format, including iPhone photos</div>
+      </div>
+      <p class="dropzone-status" id="claim-image-status" style="display: none"></p>
+      <div id="claim-image-preview"></div>
+      <input type="file" id="claim-image" accept="image/*,.heic,.heif" style="display: none" />
 
-    <label>Additional Photos (up to 5 total)</label>
-    <div id="existing-images"></div>
-    <div id="pending-images"></div>
-    <div class="dropzone" id="new-images-dropzone">
-      <div class="dropzone-icon">🖼️</div>
-      <div class="dropzone-text">Drag photos here, or click to browse</div>
-      <div class="dropzone-subtext">Any image format, including iPhone photos</div>
-    </div>
-    <p class="dropzone-status" id="new-images-status" style="display: none"></p>
-    <input type="file" id="new-images" accept="image/*,.heic,.heif" multiple style="display: none" />
-    <p id="image-limit-error" class="error-text" style="display: none"></p>
+      <label>Additional Photos (up to 5 total)</label>
+      <div id="existing-images"></div>
+      <div id="pending-images"></div>
+      <div class="dropzone" id="new-images-dropzone">
+        <div class="dropzone-icon">🖼️</div>
+        <div class="dropzone-text">Drag photos here, or click to browse</div>
+        <div class="dropzone-subtext">Any image format, including iPhone photos</div>
+      </div>
+      <p class="dropzone-status" id="new-images-status" style="display: none"></p>
+      <input type="file" id="new-images" accept="image/*,.heic,.heif" multiple style="display: none" />
+      <p id="image-limit-error" class="error-text" style="display: none"></p>
 
-    <label for="full-story-text">Full Story</label>
-    <textarea id="full-story-text" rows="5"></textarea>
+      <label for="full-story-text">Full Story</label>
+      <textarea id="full-story-text" rows="5"></textarea>
 
-    <label for="conclusion-text">Conclusion</label>
-    <textarea id="conclusion-text" rows="3"></textarea>
+      <label for="conclusion-text">Conclusion</label>
+      <textarea id="conclusion-text" rows="3"></textarea>
 
-    <label for="impact-text">Impact — how this makes things better</label>
-    <textarea id="impact-text" rows="3"></textarea>
+      <label for="impact-text">Impact — how this makes things better</label>
+      <textarea id="impact-text" rows="3"></textarea>
 
-    <button type="submit" id="save-btn">Save Changes</button>
-    <button type="button" id="publish-btn">Publish Fly</button>
-    <button type="button" id="unpublish-btn" style="display: none">Unpublish</button>
-  </form>
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button type="submit" id="save-btn" class="primary-btn">Save Changes</button>
+        <button type="button" id="publish-btn" class="secondary-btn">Publish Fly</button>
+        <button type="button" id="unpublish-btn" class="secondary-btn" style="display: none">Unpublish</button>
+      </div>
+    </form>
 
-  <p id="output"></p>
+    <p id="output" style="margin-top: 20px; font-weight: 500;"></p>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -149,7 +153,7 @@
 
     function updateProgress() {
       const filledCount = allFields.filter(el => el.value.trim().length > 0).length;
-      progressStatus.textContent = `${filledCount}/6 sections complete`;
+      progressStatus.textContent = `${filledCount}/6 SECTIONS COMPLETE`;
       publishBtn.disabled = filledCount < 6 && !currentPublished;
     }
 
@@ -246,8 +250,8 @@
 
       if (error) { output.textContent = "Error loading Fly: " + error.message; return; }
 
-      claimText.value = data.claim;
-      descriptionText.value = data.description;
+      claimText.value = data.claim || "";
+      descriptionText.value = data.description || "";
       evidenceText.value = data.evidence || "";
       fullStoryText.value = data.full_story || "";
       conclusionText.value = data.conclusion || "";
@@ -258,8 +262,8 @@
 
       renderExistingImages();
       updateProgress();
-      unpublishBtn.style.display = currentPublished ? "inline-block" : "none";
-      publishBtn.style.display = currentPublished ? "none" : "inline-block";
+      unpublishBtn.style.display = currentPublished ? "inline-flex" : "none";
+      publishBtn.style.display = currentPublished ? "none" : "inline-flex";
 
       if (currentImagePath) {
         const { data: signedData } = await supabaseClient.storage.from("evidence").createSignedUrl(currentImagePath, 3600);
@@ -287,7 +291,7 @@
       } else {
         output.textContent = "Published! This Fly is now visible on the public Feed.";
         currentPublished = true;
-        unpublishBtn.style.display = "inline-block";
+        unpublishBtn.style.display = "inline-flex";
         publishBtn.style.display = "none";
       }
     });
@@ -305,7 +309,7 @@
         output.textContent = "Unpublished. This Fly is no longer visible on the public Feed.";
         currentPublished = false;
         unpublishBtn.style.display = "none";
-        publishBtn.style.display = "inline-block";
+        publishBtn.style.display = "inline-flex";
         updateProgress();
       }
     });

@@ -20,7 +20,7 @@
   <main class="fly-wrapper">
     <a href="feed.html" class="back-link">← Back to Flies</a>
     <div id="fly-container">
-      <div class="fly-loading">Loading Fly...</div>
+      <div class="feed-state"><p>Loading Fly...</p></div>
     </div>
   </main>
 
@@ -56,13 +56,13 @@
       updateLightbox();
       lightboxOverlay.classList.add("open");
       lightboxOverlay.setAttribute("aria-hidden", "false");
-      document.body.classList.add("lightbox-open");
+      document.body.style.overflow = "hidden";
     }
 
     function closeLightbox() {
       lightboxOverlay.classList.remove("open");
       lightboxOverlay.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("lightbox-open");
+      document.body.style.overflow = "";
     }
 
     function updateLightbox() {
@@ -108,10 +108,10 @@
     function buildGalleryHtml() {
       if (!images.length) return "";
       const slides = images.map((url, i) => `<img src="${url}" alt="Evidence image ${i + 1}" loading="${i === 0 ? "eager" : "lazy"}" />`).join("");
-      const dots = images.map((_, i) => `<button class="fly-gallery-dot" data-index="${i}" aria-label="View image ${i + 1}"></button>`).join("");
+      const dots = images.map((_, i) => `<button type="button" class="fly-gallery-dot" data-index="${i}" aria-label="View image ${i + 1}"></button>`).join("");
       const arrows = images.length > 1
-        ? `<button class="fly-gallery-arrow prev" id="gallery-prev" aria-label="Previous image">‹</button>
-           <button class="fly-gallery-arrow next" id="gallery-next" aria-label="Next image">›</button>`
+        ? `<button type="button" class="fly-gallery-arrow prev" id="gallery-prev" aria-label="Previous image">‹</button>
+           <button type="button" class="fly-gallery-arrow next" id="gallery-next" aria-label="Next image">›</button>`
         : "";
       return `
         <div class="fly-gallery" id="fly-gallery">
@@ -161,10 +161,10 @@
 
       if (!flyId) {
         container.innerHTML = `
-          <div class="fly-state">
+          <div class="feed-state">
             <p class="eyebrow">ERROR</p>
             <h1>Fly not found.</h1>
-            <a href="feed.html" class="text-link">Return to Flies →</a>
+            <a href="feed.html" class="text-link">Return to Feed →</a>
           </div>`;
         return;
       }
@@ -174,11 +174,11 @@
       if (error || !data) {
         console.error("Error loading Fly:", error);
         container.innerHTML = `
-          <div class="fly-state">
+          <div class="feed-state">
             <p class="eyebrow">NOT FOUND</p>
             <h1>This Fly isn't available.</h1>
             <p>The Fly may have been removed or is not publicly available.</p>
-            <a href="feed.html" class="text-link">Return to Flies →</a>
+            <a href="feed.html" class="text-link">Return to Feed →</a>
           </div>`;
         return;
       }
