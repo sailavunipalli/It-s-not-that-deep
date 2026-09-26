@@ -1,6 +1,7 @@
 /* =========================================================
    INTD — IT'S NOT THAT DEEP
    Community / Editorial Interface
+   V1.1
    ========================================================= */
 
 
@@ -171,7 +172,9 @@ textarea {
      ------------------------------------------------------- */
 
   --content-width: 680px;
+  --page-width: 1120px;
   --feed-width: 1120px;
+
 }
 
 
@@ -216,7 +219,7 @@ body {
   background-color: var(--background);
   color: var(--text);
 
-  max-width: var(--content-width);
+  max-width: var(--page-width);
 
   margin: 0 auto;
 
@@ -229,6 +232,15 @@ body {
 
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+main {
+  width: 100%;
 }
 
 
@@ -247,16 +259,16 @@ h1 {
   margin-bottom: var(--space-5);
 
   font-size: clamp(
-    1.5rem,
-    1.15rem + 1.1vw,
-    2rem
+    1.7rem,
+    1.2rem + 2vw,
+    2.7rem
   );
 
-  line-height: 1.15;
+  line-height: 1.1;
 
   font-weight: 600;
 
-  letter-spacing: -0.035em;
+  letter-spacing: -0.045em;
 
   color: var(--text);
 }
@@ -264,13 +276,17 @@ h1 {
 h2 {
   margin-bottom: var(--space-3);
 
-  font-size: 1.05rem;
+  font-size: clamp(
+    1.25rem,
+    1.05rem + 0.7vw,
+    1.65rem
+  );
 
-  line-height: 1.3;
+  line-height: 1.2;
 
   font-weight: 600;
 
-  letter-spacing: -0.015em;
+  letter-spacing: -0.03em;
 
   color: var(--text);
 }
@@ -278,7 +294,7 @@ h2 {
 h3 {
   margin-bottom: var(--space-2);
 
-  font-size: 0.95rem;
+  font-size: 0.98rem;
 
   font-weight: 600;
 
@@ -289,16 +305,23 @@ p {
   margin-bottom: var(--space-4);
 }
 
-label {
-  display: block;
 
-  margin-bottom: var(--space-2);
+/* =========================================================
+   SECTION LABEL
+   ========================================================= */
 
-  font-size: 0.85rem;
+.section-label {
+  margin-bottom: var(--space-3);
 
-  font-weight: 500;
+  color: var(--accent);
 
-  color: var(--text-secondary);
+  font-size: 0.72rem;
+
+  font-weight: 600;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
 }
 
 
@@ -330,27 +353,6 @@ textarea:focus-visible {
 
 
 /* =========================================================
-   BACK LINK
-   ========================================================= */
-
-a.back-link {
-  display: inline-flex;
-  align-items: center;
-
-  margin-bottom: var(--space-5);
-
-  font-size: 0.82rem;
-  font-weight: 500;
-
-  color: var(--text-muted);
-}
-
-a.back-link:hover {
-  color: var(--text-secondary);
-}
-
-
-/* =========================================================
    SITE NAVIGATION
    ========================================================= */
 
@@ -362,12 +364,11 @@ a.back-link:hover {
 
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
-  gap: var(--space-5);
+  min-height: 68px;
 
-  min-height: 64px;
-
-  margin-bottom: var(--space-7);
+  margin-bottom: 0;
 
   padding:
     var(--space-3)
@@ -376,8 +377,8 @@ a.back-link:hover {
   background:
     linear-gradient(
       to bottom,
-      rgba(0, 27, 26, 0.97),
-      rgba(0, 27, 26, 0.88)
+      rgba(0, 27, 26, 0.98),
+      rgba(0, 27, 26, 0.90)
     );
 
   border-bottom: 1px solid var(--border);
@@ -386,12 +387,43 @@ a.back-link:hover {
   -webkit-backdrop-filter: blur(14px);
 }
 
+
+/* ---------------------------------------------------------
+   NAV BRAND
+   --------------------------------------------------------- */
+
+.site-nav .nav-brand {
+  color: var(--text);
+
+  font-size: 0.95rem;
+
+  font-weight: 700;
+
+  letter-spacing: -0.02em;
+}
+
+.site-nav .nav-brand::after {
+  display: none;
+}
+
+
+/* ---------------------------------------------------------
+   NAV LINKS
+   --------------------------------------------------------- */
+
+.nav-links {
+  display: flex;
+  align-items: center;
+
+  gap: var(--space-5);
+}
+
 .site-nav a {
   position: relative;
 
   padding: var(--space-2) 0;
 
-  font-size: 0.85rem;
+  font-size: 0.83rem;
 
   font-weight: 500;
 
@@ -404,7 +436,7 @@ a.back-link:hover {
   color: var(--text);
 }
 
-.site-nav a::after {
+.nav-links a::after {
   content: "";
 
   position: absolute;
@@ -418,13 +450,717 @@ a.back-link:hover {
   background-color: var(--accent);
 
   transform: scaleX(0);
+
   transform-origin: center;
 
   transition: transform 160ms ease;
 }
 
-.site-nav a:hover::after {
+.nav-links a:hover::after {
   transform: scaleX(1);
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero-section {
+  max-width: 860px;
+
+  padding:
+    112px
+    0
+    104px;
+
+  border-bottom:
+    1px solid
+    var(--border);
+}
+
+
+/* ---------------------------------------------------------
+   HERO EYEBROW
+   --------------------------------------------------------- */
+
+.hero-eyebrow {
+  margin-bottom: var(--space-5);
+
+  color: var(--accent);
+
+  font-size: 0.72rem;
+
+  font-weight: 600;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+}
+
+
+/* ---------------------------------------------------------
+   HERO TITLE
+   --------------------------------------------------------- */
+
+.hero-section h1 {
+  max-width: 820px;
+
+  margin-bottom: var(--space-5);
+
+  font-size: clamp(
+    2.5rem,
+    5vw,
+    5rem
+  );
+
+  line-height: 0.98;
+
+  letter-spacing: -0.065em;
+}
+
+
+/* ---------------------------------------------------------
+   HERO DESCRIPTION
+   --------------------------------------------------------- */
+
+.hero-description {
+  max-width: 650px;
+
+  margin-bottom: var(--space-7);
+
+  color: var(--text-secondary);
+
+  font-size: clamp(
+    1rem,
+    0.95rem + 0.25vw,
+    1.12rem
+  );
+
+  line-height: 1.7;
+}
+
+
+/* ---------------------------------------------------------
+   HERO ACTIONS
+   --------------------------------------------------------- */
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+
+  gap: var(--space-3);
+
+  flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+button,
+.primary-btn,
+.secondary-btn {
+  appearance: none;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+
+  padding:
+    10px
+    18px;
+
+  border:
+    1px solid transparent;
+
+  border-radius: var(--radius-sm);
+
+  font-size: 0.86rem;
+
+  font-weight: 600;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 120ms ease,
+    box-shadow 160ms ease;
+}
+
+
+/* ---------------------------------------------------------
+   PRIMARY
+   --------------------------------------------------------- */
+
+.primary-btn,
+button {
+  background-color: var(--accent);
+
+  color: var(--rich-black);
+}
+
+.primary-btn:hover,
+button:hover {
+  background-color: var(--accent-hover);
+
+  color: var(--rich-black);
+
+  box-shadow:
+    0 5px 18px
+    rgba(0, 223, 129, 0.10);
+}
+
+.primary-btn:active,
+button:active {
+  transform: translateY(1px);
+}
+
+
+/* ---------------------------------------------------------
+   SECONDARY
+   --------------------------------------------------------- */
+
+.secondary-btn {
+  background-color: transparent;
+
+  color: var(--text-secondary);
+
+  border-color: var(--border-strong);
+}
+
+.secondary-btn:hover {
+  background-color: var(--surface-2);
+
+  color: var(--text);
+
+  border-color: var(--border-hover);
+
+  box-shadow: none;
+}
+
+
+/* =========================================================
+   HOW IT WORKS
+   ========================================================= */
+
+.how-it-works-section {
+  padding:
+    var(--space-9)
+    0;
+
+  border-bottom:
+    1px solid
+    var(--border);
+}
+
+.section-heading {
+  margin-bottom: var(--space-7);
+}
+
+.section-heading h2 {
+  max-width: 600px;
+}
+
+.section-heading > p:not(.section-label) {
+  max-width: 650px;
+
+  color: var(--text-secondary);
+
+  line-height: 1.7;
+}
+
+
+/* ---------------------------------------------------------
+   PROCESS GRID
+   --------------------------------------------------------- */
+
+.process-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 1px;
+
+  background-color: var(--border);
+
+  border:
+    1px solid
+    var(--border);
+}
+
+.process-step {
+  min-height: 190px;
+
+  padding: var(--space-6);
+
+  background-color: var(--background);
+}
+
+.process-number {
+  display: block;
+
+  margin-bottom: var(--space-7);
+
+  color: var(--accent);
+
+  font-size: 0.72rem;
+
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+}
+
+.process-step h3 {
+  margin-bottom: var(--space-2);
+
+  font-size: 1rem;
+}
+
+.process-step p {
+  max-width: 280px;
+
+  margin-bottom: 0;
+
+  color: var(--text-muted);
+
+  font-size: 0.87rem;
+
+  line-height: 1.65;
+}
+
+
+/* =========================================================
+   RECENT FLIES
+   ========================================================= */
+
+.recent-flies-section {
+  padding:
+    var(--space-9)
+    0;
+
+  border-bottom:
+    1px solid
+    var(--border);
+}
+
+
+/* ---------------------------------------------------------
+   SECTION HEADING ROW
+   --------------------------------------------------------- */
+
+.section-heading-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: var(--space-5);
+}
+
+
+/* ---------------------------------------------------------
+   SECTION LINK
+   --------------------------------------------------------- */
+
+.section-link {
+  flex-shrink: 0;
+
+  margin-bottom: var(--space-3);
+
+  color: var(--text-muted);
+
+  font-size: 0.8rem;
+
+  font-weight: 500;
+}
+
+.section-link:hover {
+  color: var(--accent);
+}
+
+
+/* ---------------------------------------------------------
+   RECENT FLY GRID
+   --------------------------------------------------------- */
+
+.recent-flies-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: var(--space-4);
+}
+
+
+/* ---------------------------------------------------------
+   RECENT FLY CARD
+   --------------------------------------------------------- */
+
+.recent-fly-card {
+  min-width: 0;
+
+  background-color: var(--surface);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: var(--radius-lg);
+
+  overflow: hidden;
+
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.recent-fly-card:hover {
+  background-color: var(--surface-2);
+
+  border-color: var(--border-hover);
+
+  transform: translateY(-2px);
+
+  box-shadow: var(--shadow-sm);
+}
+
+
+/* ---------------------------------------------------------
+   RECENT FLY LINK
+   --------------------------------------------------------- */
+
+.recent-fly-card-link {
+  display: flex;
+
+  flex-direction: column;
+
+  min-height: 235px;
+
+  padding: var(--space-6);
+
+  color: inherit;
+}
+
+.recent-fly-card-link:hover {
+  color: inherit;
+}
+
+
+/* ---------------------------------------------------------
+   RECENT FLY META
+   --------------------------------------------------------- */
+
+.recent-fly-card-meta {
+  margin-bottom: auto;
+}
+
+.recent-fly-card-meta span {
+  color: var(--accent);
+
+  font-size: 0.68rem;
+
+  font-weight: 600;
+
+  letter-spacing: 0.12em;
+}
+
+
+/* ---------------------------------------------------------
+   RECENT FLY CLAIM
+   --------------------------------------------------------- */
+
+.recent-fly-card h3 {
+  max-width: 540px;
+
+  margin:
+    var(--space-7)
+    0
+    var(--space-5);
+
+  color: var(--text);
+
+  font-size: clamp(
+    1rem,
+    0.9rem + 0.3vw,
+    1.18rem
+  );
+
+  font-weight: 600;
+
+  line-height: 1.42;
+
+  letter-spacing: -0.025em;
+}
+
+
+/* ---------------------------------------------------------
+   RECENT FLY ACTION
+   --------------------------------------------------------- */
+
+.recent-fly-card-action {
+  color: var(--text-muted);
+
+  font-size: 0.76rem;
+
+  font-weight: 500;
+}
+
+.recent-fly-card:hover .recent-fly-card-action {
+  color: var(--accent);
+}
+
+
+/* ---------------------------------------------------------
+   RECENT FLY ERROR / EMPTY
+   --------------------------------------------------------- */
+
+.empty-state,
+.feed-error {
+  grid-column: 1 / -1;
+
+  margin: 0;
+
+  padding:
+    var(--space-7)
+    var(--space-5);
+
+  text-align: center;
+
+  color: var(--text-muted);
+
+  border:
+    1px dashed
+    var(--border);
+
+  border-radius: var(--radius-lg);
+}
+
+
+/* =========================================================
+   FLY STRUCTURE
+   ========================================================= */
+
+.fly-structure-section {
+  padding:
+    var(--space-9)
+    0;
+
+  border-bottom:
+    1px solid
+    var(--border);
+}
+
+
+/* ---------------------------------------------------------
+   STRUCTURE
+   --------------------------------------------------------- */
+
+.fly-structure {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+
+  margin-bottom: var(--space-6);
+
+  overflow-x: auto;
+
+  scrollbar-width: thin;
+}
+
+
+/* ---------------------------------------------------------
+   STRUCTURE ITEM
+   --------------------------------------------------------- */
+
+.fly-structure-item {
+  flex-shrink: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: var(--space-2);
+
+  min-width: 120px;
+}
+
+.fly-structure-item span {
+  color: var(--accent);
+
+  font-size: 0.68rem;
+
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+}
+
+.fly-structure-item strong {
+  color: var(--text);
+
+  font-size: 0.88rem;
+
+  font-weight: 500;
+}
+
+
+/* ---------------------------------------------------------
+   STRUCTURE LINE
+   --------------------------------------------------------- */
+
+.fly-structure-line {
+  flex: 1;
+
+  min-width: 24px;
+
+  height: 1px;
+
+  margin:
+    0
+    var(--space-3);
+
+  background-color: var(--border-strong);
+}
+
+
+/* ---------------------------------------------------------
+   STRUCTURE DESCRIPTION
+   --------------------------------------------------------- */
+
+.fly-structure-description {
+  max-width: 680px;
+
+  margin-bottom: 0;
+
+  color: var(--text-muted);
+
+  font-size: 0.88rem;
+
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   AUTH
+   ========================================================= */
+
+.auth-section {
+  max-width: 600px;
+
+  margin:
+    var(--space-9)
+    auto;
+
+  padding: var(--space-7);
+
+  background-color: var(--surface);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: var(--radius-lg);
+}
+
+.form-heading {
+  margin-bottom: var(--space-6);
+}
+
+.form-heading h2 {
+  margin-bottom: var(--space-2);
+}
+
+.form-heading p:not(.section-label) {
+  margin-bottom: 0;
+
+  color: var(--text-muted);
+
+  font-size: 0.86rem;
+
+  line-height: 1.65;
+}
+
+
+/* ---------------------------------------------------------
+   LOGGED IN ACTIONS
+   --------------------------------------------------------- */
+
+.logged-in-actions {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: var(--space-3);
+}
+
+.logged-in-actions .secondary-btn,
+.logged-in-actions button {
+  margin: 0;
+}
+
+
+/* ---------------------------------------------------------
+   AUTH STATUS
+   --------------------------------------------------------- */
+
+#auth-status {
+  margin:
+    var(--space-4)
+    0
+    0;
+
+  color: var(--text-muted);
+
+  font-size: 0.8rem;
+}
+
+
+/* =========================================================
+   FORM LABELS
+   ========================================================= */
+
+label {
+  display: block;
+
+  margin-bottom: var(--space-2);
+
+  color: var(--text-secondary);
+
+  font-size: 0.82rem;
+
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   FORM GROUPS
+   ========================================================= */
+
+.form-group {
+  margin-bottom: var(--space-7);
+}
+
+.field-description {
+  margin:
+    -4px
+    0
+    var(--space-3);
+
+  color: var(--text-muted);
+
+  font-size: 0.78rem;
+
+  line-height: 1.55;
 }
 
 
@@ -440,10 +1176,11 @@ textarea {
     11px
     13px;
 
-  margin-bottom: var(--space-4);
+  margin-bottom: 0;
 
   border:
-    1px solid var(--border);
+    1px solid
+    var(--border);
 
   border-radius: var(--radius-sm);
 
@@ -492,166 +1229,6 @@ textarea:focus {
 
 
 /* =========================================================
-   BUTTONS
-   ========================================================= */
-
-button {
-  appearance: none;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 40px;
-
-  padding:
-    9px
-    17px;
-
-  margin:
-    0
-    var(--space-2)
-    var(--space-2)
-    0;
-
-  border:
-    1px solid transparent;
-
-  border-radius: var(--radius-sm);
-
-  background-color: var(--accent);
-
-  color: var(--rich-black);
-
-  font-size: 0.87rem;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    background-color 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease,
-    transform 120ms ease,
-    box-shadow 160ms ease;
-}
-
-button:hover {
-  background-color: var(--accent-hover);
-
-  box-shadow:
-    0 5px 18px
-    rgba(0, 223, 129, 0.10);
-}
-
-button:active {
-  transform: translateY(1px);
-}
-
-
-/* ---------------------------------------------------------
-   PUBLISH
-   --------------------------------------------------------- */
-
-#publish-btn {
-  background-color: transparent;
-
-  color: var(--accent);
-
-  border-color: var(--accent-soft);
-}
-
-#publish-btn:hover {
-  background-color: var(--surface-2);
-
-  border-color: var(--accent);
-
-  box-shadow: none;
-}
-
-
-/* ---------------------------------------------------------
-   LOGOUT
-   --------------------------------------------------------- */
-
-#logout-btn {
-  background-color: var(--surface-3);
-
-  color: var(--pistachio);
-
-  border-color:
-    rgba(170, 203, 196, 0.15);
-}
-
-#logout-btn:hover {
-  background-color: var(--forest);
-
-  color: var(--text);
-
-  box-shadow: none;
-}
-
-
-/* ---------------------------------------------------------
-   DELETE
-   --------------------------------------------------------- */
-
-.delete-btn {
-  background-color: transparent;
-
-  color: var(--danger);
-
-  border-color:
-    rgba(255, 107, 107, 0.35);
-
-  margin-top: var(--space-2);
-}
-
-.delete-btn:hover {
-  background-color:
-    rgba(255, 107, 107, 0.08);
-
-  color: var(--danger-hover);
-
-  box-shadow: none;
-}
-
-
-/* =========================================================
-   AUTH
-   ========================================================= */
-
-#auth-section {
-  padding: var(--space-6);
-
-  margin-bottom: var(--space-7);
-
-  background-color: var(--surface);
-
-  border:
-    1px solid var(--border);
-
-  border-radius: var(--radius-lg);
-}
-
-.switch-auth {
-  margin-top: var(--space-3);
-
-  font-size: 0.82rem;
-
-  color: var(--text-muted);
-}
-
-.error-text {
-  margin-bottom: var(--space-3);
-
-  font-size: 0.82rem;
-
-  color: var(--danger);
-}
-
-
-/* =========================================================
    PASSWORD FIELD
    ========================================================= */
 
@@ -664,7 +1241,7 @@ button:active {
 .password-wrapper input {
   margin-bottom: 0;
 
-  padding-right: 48px;
+  padding-right: 58px;
 }
 
 .toggle-password-btn {
@@ -673,20 +1250,25 @@ button:active {
   top: 50%;
   right: 5px;
 
-  transform: translateY(-50%);
-
-  width: 36px;
-  min-height: 32px;
+  width: auto;
+  min-width: 44px;
+  min-height: 30px;
 
   margin: 0;
 
-  padding: 4px;
+  padding:
+    4px
+    8px;
+
+  transform: translateY(-50%);
 
   background: transparent;
 
   color: var(--stone);
 
   border: none;
+
+  font-size: 0.72rem;
 
   box-shadow: none;
 }
@@ -697,6 +1279,136 @@ button:active {
   color: var(--mint);
 
   box-shadow: none;
+}
+
+
+/* =========================================================
+   AUTH SWITCH
+   ========================================================= */
+
+.switch-auth {
+  margin:
+    var(--space-4)
+    0
+    0;
+
+  color: var(--text-muted);
+
+  font-size: 0.8rem;
+}
+
+.error-text {
+  margin-bottom: var(--space-3);
+
+  color: var(--danger);
+
+  font-size: 0.82rem;
+}
+
+
+/* =========================================================
+   SUBMIT CLAIM SECTION
+   ========================================================= */
+
+.claim-section {
+  max-width: 760px;
+
+  margin:
+    var(--space-9)
+    auto;
+
+  padding:
+    var(--space-8)
+    0;
+
+  border-top:
+    1px solid
+    var(--border);
+
+  border-bottom:
+    1px solid
+    var(--border);
+}
+
+.claim-section .section-heading {
+  margin-bottom: var(--space-8);
+}
+
+.claim-section form {
+  width: 100%;
+}
+
+
+/* =========================================================
+   FORM ACTIONS
+   ========================================================= */
+
+.form-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: var(--space-3);
+
+  padding-top: var(--space-2);
+}
+
+
+/* =========================================================
+   DROPZONE
+   ========================================================= */
+
+.dropzone {
+  margin-bottom: var(--space-3);
+
+  padding:
+    var(--space-7)
+    var(--space-5);
+
+  text-align: center;
+
+  background-color: var(--surface);
+
+  border:
+    1px dashed
+    var(--border-strong);
+
+  border-radius: var(--radius-md);
+
+  cursor: pointer;
+
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.dropzone:hover,
+.dropzone.dragover {
+  background-color: var(--surface-2);
+
+  border-color: var(--accent);
+}
+
+.dropzone-text {
+  color: var(--text-secondary);
+
+  font-size: 0.84rem;
+}
+
+.dropzone-subtext {
+  margin-top: var(--space-1);
+
+  color: var(--text-muted);
+
+  font-size: 0.75rem;
+}
+
+.dropzone-status {
+  margin-bottom: var(--space-3);
+
+  color: var(--accent);
+
+  font-size: 0.8rem;
 }
 
 
@@ -732,168 +1444,46 @@ button:active {
 
 
 /* =========================================================
-   DROPZONE
+   MY FLIES
    ========================================================= */
 
-.dropzone {
-  margin-bottom: var(--space-3);
-
+.my-flies-section {
   padding:
-    var(--space-6)
-    var(--space-4);
-
-  text-align: center;
-
-  background-color: var(--surface);
-
-  border:
-    1px dashed
-    var(--border-strong);
-
-  border-radius: var(--radius-md);
-
-  cursor: pointer;
-
-  transition:
-    border-color 160ms ease,
-    background-color 160ms ease;
-}
-
-.dropzone:hover,
-.dropzone.dragover {
-  background-color: var(--surface-2);
-
-  border-color: var(--accent);
-}
-
-.dropzone-icon {
-  margin-bottom: var(--space-2);
-
-  color: var(--mint);
-
-  font-size: 1.4rem;
-}
-
-.dropzone-text {
-  color: var(--text-secondary);
-
-  font-size: 0.84rem;
-}
-
-.dropzone-subtext {
-  margin-top: var(--space-1);
-
-  color: var(--text-muted);
-
-  font-size: 0.75rem;
-}
-
-.dropzone-status {
-  margin-bottom: var(--space-3);
-
-  color: var(--accent);
-
-  font-size: 0.8rem;
-}
-
-
-/* =========================================================
-   IMAGE THUMBNAILS
-   ========================================================= */
-
-.image-thumb-wrapper {
-  position: relative;
-
-  display: inline-block;
-
-  margin:
-    0
-    var(--space-2)
-    var(--space-2)
+    var(--space-9)
     0;
-}
 
-.image-thumb-wrapper img {
-  display: block;
-
-  width: 64px;
-  height: 64px;
-
-  object-fit: cover;
-
-  border:
+  border-bottom:
     1px solid
     var(--border);
-
-  border-radius: var(--radius-sm);
-}
-
-.remove-image-btn {
-  position: absolute;
-
-  top: -6px;
-  right: -6px;
-
-  width: 20px;
-  height: 20px;
-
-  padding: 0;
-  margin: 0;
-
-  border: none;
-
-  border-radius: 50%;
-
-  background-color: var(--danger);
-
-  color: var(--rich-black);
-
-  font-size: 0.7rem;
-
-  line-height: 1;
-
-  box-shadow: none;
-}
-
-.remove-image-btn:hover {
-  background-color: var(--danger-hover);
-
-  box-shadow: none;
-}
-
-.fly-thumbnail {
-  display: block;
-
-  width: 64px;
-  height: 64px;
-
-  margin-bottom: var(--space-2);
-
-  object-fit: cover;
-
-  border:
-    1px solid
-    var(--border);
-
-  border-radius: var(--radius-sm);
 }
 
 
-/* =========================================================
-   LISTS
-   ========================================================= */
+/* ---------------------------------------------------------
+   MY FLY LIST
+   --------------------------------------------------------- */
 
-ul {
-  list-style: none;
+#flies-list {
+  display: grid;
 
-  margin: 0;
-  padding: 0;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: var(--space-4);
 }
 
-li {
-  margin-bottom: var(--space-3);
 
-  padding: var(--space-4);
+/* ---------------------------------------------------------
+   MY FLY CARD
+   --------------------------------------------------------- */
+
+.my-fly-card {
+  display: flex;
+
+  flex-direction: column;
+
+  min-width: 0;
+
+  overflow: hidden;
 
   background-color: var(--surface);
 
@@ -901,77 +1491,125 @@ li {
     1px solid
     var(--border);
 
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
 
   transition:
-    border-color 160ms ease,
-    background-color 160ms ease;
+    border-color 180ms ease,
+    background-color 180ms ease;
 }
 
-li:hover {
+.my-fly-card:hover {
   background-color: var(--surface-2);
 
   border-color: var(--border-hover);
 }
 
-li strong {
-  color: var(--text);
 
-  font-size: 0.96rem;
+/* ---------------------------------------------------------
+   MY FLY CONTENT
+   --------------------------------------------------------- */
+
+.my-fly-content {
+  padding: var(--space-5);
+}
+
+.my-fly-content h3 {
+  margin-bottom: var(--space-3);
+
+  line-height: 1.4;
+}
+
+.my-fly-content p {
+  margin-bottom: var(--space-4);
+
+  color: var(--text-secondary);
+
+  font-size: 0.82rem;
+
+  line-height: 1.6;
+}
+
+.my-fly-content small {
+  color: var(--text-muted);
+
+  font-size: 0.72rem;
+}
+
+
+/* ---------------------------------------------------------
+   MY FLY IMAGE
+   --------------------------------------------------------- */
+
+.my-fly-card .fly-thumbnail {
+  width: 100%;
+  height: 180px;
+
+  margin: 0;
+
+  object-fit: cover;
+
+  border: none;
+
+  border-bottom:
+    1px solid
+    var(--border);
+
+  border-radius: 0;
+}
+
+
+/* =========================================================
+   FINAL CTA
+   ========================================================= */
+
+.final-cta-section {
+  padding:
+    112px
+    0
+    80px;
+
+  text-align: center;
+}
+
+.final-cta-section h2 {
+  margin-bottom: var(--space-7);
+
+  font-size: clamp(
+    2rem,
+    4vw,
+    3.5rem
+  );
+
+  line-height: 1;
+
+  letter-spacing: -0.055em;
+}
+
+.final-cta-section .primary-btn {
+  display: inline-flex;
+}
+
+
+/* =========================================================
+   BACK LINK
+   ========================================================= */
+
+a.back-link {
+  display: inline-flex;
+  align-items: center;
+
+  margin-bottom: var(--space-5);
+
+  color: var(--text-muted);
+
+  font-size: 0.82rem;
 
   font-weight: 500;
 }
 
-li small {
-  color: var(--text-muted);
-
-  font-size: 0.78rem;
+a.back-link:hover {
+  color: var(--text-secondary);
 }
-
-
-/* =========================================================
-   EMPTY STATES
-   ========================================================= */
-
-#flies-list li:only-child,
-#feed-list > p {
-  padding:
-    var(--space-8)
-    var(--space-4);
-
-  text-align: center;
-
-  color: var(--text-muted);
-
-  background: transparent;
-
-  border:
-    1px dashed
-    var(--border);
-
-  border-radius: var(--radius-lg);
-}
-
-
-/* =========================================================
-   RECENT FLIES
-   ========================================================= */
-
-#recent-flies-section {
-  margin-bottom: var(--space-7);
-}
-
-#recent-flies-list li {
-  padding:
-    var(--space-3)
-    var(--space-4);
-
-  font-size: 0.9rem;
-}
-
-
-/* No decorative emoji.
-   INTD stays typographic and editorial. */
 
 
 /* =========================================================
@@ -987,6 +1625,12 @@ li small {
   gap: var(--space-6);
 
   width: 100%;
+}
+
+body:has(#feed-list) {
+  width: 100%;
+
+  max-width: var(--feed-width);
 }
 
 
@@ -1100,8 +1744,6 @@ li small {
   color: var(--text-muted);
 
   font-size: 0.78rem;
-
-  letter-spacing: 0.01em;
 }
 
 
@@ -1133,54 +1775,6 @@ li small {
 }
 
 
-/* ---------------------------------------------------------
-   OPTIONAL FEED CTA
-   --------------------------------------------------------- */
-
-.feed-item .feed-cta {
-  margin:
-    calc(var(--space-5) * -1)
-    var(--space-5)
-    var(--space-5);
-
-  color: var(--mint);
-
-  font-size: 0.76rem;
-
-  font-weight: 500;
-}
-
-
-/* ---------------------------------------------------------
-   FEED DESKTOP WIDTH
-   --------------------------------------------------------- */
-
-body:has(#feed-list) {
-  width: 100%;
-
-  max-width: var(--feed-width);
-}
-
-
-/* ---------------------------------------------------------
-   FEED GRID
-   --------------------------------------------------------- */
-
-@media (min-width: 700px) {
-  body:has(#feed-list) {
-    padding-left: var(--space-6);
-    padding-right: var(--space-6);
-  }
-
-  body:has(#feed-list) #feed-list {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-
-    gap: var(--space-6);
-  }
-}
-
-
 /* =========================================================
    FLY DETAIL PAGE
    ========================================================= */
@@ -1188,7 +1782,12 @@ body:has(#feed-list) {
 .fly-page {
   width: 100%;
 
-  margin-top: var(--space-4);
+  max-width: var(--content-width);
+
+  margin:
+    var(--space-4)
+    auto
+    0;
 }
 
 
@@ -1628,19 +2227,21 @@ body:has(#feed-list) {
 
 
 /* =========================================================
-   PROFILE / FLY LIST
+   RESPONSIVE — LAPTOP / DESKTOP
    ========================================================= */
 
-#flies-list {
-  display: flex;
+@media (min-width: 1200px) {
 
-  flex-direction: column;
+  body {
+    padding-left: var(--space-7);
+    padding-right: var(--space-7);
+  }
 
-  gap: var(--space-3);
-}
+  .hero-section {
+    padding-top: 136px;
+    padding-bottom: 120px;
+  }
 
-#flies-list li {
-  margin-bottom: 0;
 }
 
 
@@ -1648,33 +2249,224 @@ body:has(#feed-list) {
    RESPONSIVE — TABLET
    ========================================================= */
 
-@media (max-width: 699px) {
+@media (max-width: 800px) {
 
   body {
     padding-left: var(--space-4);
     padding-right: var(--space-4);
   }
 
-  .site-nav {
-    gap: var(--space-4);
+  .process-grid {
+    grid-template-columns: 1fr;
+  }
 
-    margin-bottom: var(--space-6);
+  .process-step {
+    min-height: auto;
+
+    padding:
+      var(--space-5);
+  }
+
+  .process-number {
+    margin-bottom: var(--space-4);
+  }
+
+  .recent-flies-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #flies-list {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-section {
+    padding:
+      88px
+      0
+      80px;
+  }
+
+  .how-it-works-section,
+  .recent-flies-section,
+  .fly-structure-section,
+  .my-flies-section {
+    padding:
+      72px
+      0;
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  body {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+
+    padding-bottom: var(--space-8);
+  }
+
+
+  /* -------------------------------------------------------
+     NAV
+     ------------------------------------------------------- */
+
+  .site-nav {
+    min-height: 58px;
+  }
+
+  .nav-links {
+    gap: var(--space-4);
   }
 
   .site-nav a {
-    font-size: 0.83rem;
+    font-size: 0.78rem;
   }
 
-  #auth-section {
+
+  /* -------------------------------------------------------
+     HERO
+     ------------------------------------------------------- */
+
+  .hero-section {
+    padding:
+      72px
+      0
+      64px;
+  }
+
+  .hero-section h1 {
+    font-size: clamp(
+      2.25rem,
+      12vw,
+      3.5rem
+    );
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+  }
+
+  .hero-actions {
+    align-items: stretch;
+
+    flex-direction: column;
+
+    max-width: 280px;
+  }
+
+  .hero-actions .primary-btn,
+  .hero-actions .secondary-btn {
+    width: 100%;
+  }
+
+
+  /* -------------------------------------------------------
+     SECTION HEADINGS
+     ------------------------------------------------------- */
+
+  .section-heading-row {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: var(--space-3);
+  }
+
+  .section-heading-row .section-link {
+    margin-bottom: 0;
+  }
+
+
+  /* -------------------------------------------------------
+     SECTIONS
+     ------------------------------------------------------- */
+
+  .how-it-works-section,
+  .recent-flies-section,
+  .fly-structure-section,
+  .my-flies-section {
+    padding:
+      64px
+      0;
+  }
+
+
+  /* -------------------------------------------------------
+     FLY STRUCTURE
+     ------------------------------------------------------- */
+
+  .fly-structure {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    overflow: visible;
+  }
+
+  .fly-structure-item {
+    min-width: 0;
+
+    width: 100%;
+
+    padding:
+      var(--space-3)
+      0;
+
+    border-bottom:
+      1px solid
+      var(--border);
+  }
+
+  .fly-structure-line {
+    display: none;
+  }
+
+
+  /* -------------------------------------------------------
+     AUTH
+     ------------------------------------------------------- */
+
+  .auth-section {
+    margin:
+      64px
+      0;
+
     padding: var(--space-5);
   }
 
-  .feed-item .feed-claim {
+
+  /* -------------------------------------------------------
+     CLAIM
+     ------------------------------------------------------- */
+
+  .claim-section {
+    margin:
+      64px
+      0;
+
     padding:
-      var(--space-4)
-      var(--space-4)
-      var(--space-5);
+      64px
+      0;
   }
+
+
+  /* -------------------------------------------------------
+     FINAL CTA
+     ------------------------------------------------------- */
+
+  .final-cta-section {
+    padding:
+      80px
+      0
+      56px;
+  }
+
 }
 
 
@@ -1687,41 +2479,75 @@ body:has(#feed-list) {
   body {
     padding-left: var(--space-3);
     padding-right: var(--space-3);
-
-    padding-bottom: var(--space-8);
   }
 
+
   .site-nav {
-    min-height: 58px;
+    min-height: 56px;
+  }
 
+  .nav-links {
     gap: var(--space-3);
-
-    margin-bottom: var(--space-5);
   }
 
   .site-nav a {
-    font-size: 0.78rem;
+    font-size: 0.75rem;
   }
 
-  h1 {
-    font-size: 1.45rem;
 
-    margin-bottom: var(--space-4);
+  .hero-section {
+    padding:
+      60px
+      0
+      56px;
   }
 
-  #auth-section {
+  .hero-section h1 {
+    font-size: 2.35rem;
+
+    letter-spacing: -0.055em;
+  }
+
+
+  .recent-fly-card-link {
+    min-height: 210px;
+
+    padding: var(--space-5);
+  }
+
+
+  .recent-fly-card h3 {
+    margin-top: var(--space-6);
+
+    font-size: 1rem;
+  }
+
+
+  .auth-section {
     padding: var(--space-4);
   }
 
-  .feed-item {
-    border-radius: var(--radius-md);
+
+  .claim-section {
+    padding:
+      56px
+      0;
   }
 
-  .feed-item .feed-claim {
-    font-size: 1rem;
 
-    line-height: 1.42;
+  .form-group {
+    margin-bottom: var(--space-6);
   }
+
+
+  .final-cta-section h2 {
+    font-size: 2.35rem;
+  }
+
+
+  /* -------------------------------------------------------
+     FLY DETAIL
+     ------------------------------------------------------- */
 
   .fly-section {
     padding:
@@ -1744,6 +2570,11 @@ body:has(#feed-list) {
     height: 30px;
   }
 
+
+  /* -------------------------------------------------------
+     LIGHTBOX
+     ------------------------------------------------------- */
+
   .lightbox-arrow.prev {
     left: 4px;
   }
@@ -1761,9 +2592,15 @@ body:has(#feed-list) {
     bottom: -28px;
   }
 
+
+  /* -------------------------------------------------------
+     PROFILE
+     ------------------------------------------------------- */
+
   #profile-header {
     margin-bottom: var(--space-6);
   }
+
 }
 
 
@@ -1784,6 +2621,7 @@ body:has(#feed-list) {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+
 }
 
 
@@ -1816,4 +2654,5 @@ body:has(#feed-list) {
   h1 {
     color: black;
   }
+
 }
