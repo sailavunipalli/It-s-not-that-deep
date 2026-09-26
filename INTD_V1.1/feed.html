@@ -5,10 +5,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>It's Not That Deep — Feed</title>
+
     <link rel="stylesheet" href="styles.css?v=2" />
 </head>
 
 <body>
+
     <nav class="site-nav">
         <a href="index.html">Home</a>
         <a href="feed.html">Feed</a>
@@ -20,12 +22,14 @@
     <div id="feed-list"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
         const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
+
         const supabaseClient = window.supabase.createClient(
             SUPABASE_URL,
-            SUPABASE_ANON_KEY,
+            SUPABASE_ANON_KEY
         );
 
         async function loadFeed() {
@@ -35,7 +39,8 @@
             feedList.innerHTML = "";
 
             if (error) {
-                feedList.innerHTML = "<p>Error loading feed: " + error.message + "</p>";
+                feedList.innerHTML =
+                    "<p>Error loading feed: " + error.message + "</p>";
                 return;
             }
 
@@ -49,25 +54,51 @@
                 div.className = "feed-item";
 
                 let imageHtml = "";
+                let thumbnailUrl = null;
+
                 if (fly.evidence_image_path) {
-                    const { data: publicUrlData } = supabaseClient.storage
-                        .from("evidence")
-                        .getPublicUrl(fly.evidence_image_path);
-                    imageHtml = `<img src="${publicUrlData.publicUrl}" alt="Evidence photo" />`;
+                    const { data: publicUrlData } =
+                        supabaseClient.storage
+                            .from("evidence")
+                            .getPublicUrl(fly.evidence_image_path);
+
+                    thumbnailUrl = publicUrlData.publicUrl;
+                } else if (
+                    fly.image_urls &&
+                    fly.image_urls.length > 0
+                ) {
+                    thumbnailUrl = fly.image_urls[0];
+                }
+
+                if (thumbnailUrl) {
+                    imageHtml = `
+                        <img
+                            src="${thumbnailUrl}"
+                            alt="Evidence photo"
+                        />
+                    `;
+                } else {
+                    imageHtml = `
+                        <div class="no-image-placeholder">
+                            No image attached
+                        </div>
+                    `;
                 }
 
                 div.innerHTML = `
-                <a href="fly.html?id=${fly.id}" class="fly-link">
-                    ${imageHtml}
-                    <p class="feed-claim">${fly.claim}</p>
-                </a>
+                    <a href="fly.html?id=${fly.id}" class="fly-link">
+                        ${imageHtml}
+                        <p class="feed-claim">${fly.claim}</p>
+                    </a>
                 `;
+
                 feedList.appendChild(div);
             });
         }
 
         loadFeed();
     </script>
+
 </body>
 
 </html>
