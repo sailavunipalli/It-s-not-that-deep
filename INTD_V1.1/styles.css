@@ -216,37 +216,125 @@ input:focus, textarea:focus {
 }
 
 /* =========================================================
-   5. CARDS & GRIDS
+   FIXED FEED CARDS & SPACING
    ========================================================= */
-.recent-flies-grid, #flies-list, .feed-grid, #feed-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+
+/* Feed grid container with good spacing */
+.recent-flies-grid, 
+#flies-list, 
+.feed-grid, 
+#feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* Generous spacing between cards */
+  max-width: 760px;
+  margin: 0 auto;
 }
 
-.recent-fly-card, .my-fly-card, .feed-card, .fly-card {
-  min-width: 0;
-  overflow: hidden;
+/* Individual Card Styling */
+.recent-fly-card, 
+.my-fly-card, 
+.feed-card, 
+.feed-item,
+.fly-card {
+  display: flex;
+  flex-direction: column;
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  transition: border-color 100ms linear, background 100ms linear;
+  padding: 24px; /* Proper internal padding so content isn't cramped */
+  overflow: hidden;
+  transition: border-color 150s ease, background-color 150ms ease;
 }
 
-.recent-fly-card:hover, .my-fly-card:hover, .feed-card:hover, .fly-card:hover {
+.recent-fly-card:hover, 
+.my-fly-card:hover, 
+.feed-card:hover, 
+.fly-card:hover {
   border-color: var(--border-hover);
   background: var(--surface-2);
 }
 
-.dropzone {
-  padding: 32px 24px;
-  text-align: center;
-  background: var(--surface);
-  border: 1px dashed var(--border-strong);
-  border-radius: var(--radius-md);
-  cursor: pointer;
+/* Card Metadata / Eyebrow */
+.recent-fly-card-meta,
+.feed-card-meta,
+.fly-card-header {
+  margin-bottom: 12px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
-.dropzone:hover { background: var(--surface-2); border-color: var(--text); }
+
+/* Card Titles / Claims */
+.recent-fly-card h3,
+.feed-card-claim,
+.fly-card-claim {
+  margin: 0 0 12px 0;
+  color: var(--text);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+/* Card Paragraph / Description */
+.recent-fly-card p,
+.feed-card-description,
+.fly-card-description {
+  margin: 0 0 20px 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+/* Card Media / Images */
+.recent-fly-card img,
+.feed-card-image img,
+.fly-card-media img,
+.feed-item img {
+  width: 100%;
+  max-height: 380px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+  display: block;
+  background: var(--surface-2);
+}
+
+/* Card Footer Actions Layout */
+.recent-fly-card-footer,
+.feed-card-footer,
+.fly-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 600px) {
+  .recent-flies-grid, 
+  #flies-list, 
+  .feed-grid, 
+  #feed-list {
+    gap: 16px;
+  }
+  
+  .recent-fly-card, 
+  .my-fly-card, 
+  .feed-card, 
+  .feed-item,
+  .fly-card {
+    padding: 16px; /* Slightly tighter padding on small screens */
+  }
+}
 
 /* =========================================================
    6. LIGHTBOX & GALLERY
