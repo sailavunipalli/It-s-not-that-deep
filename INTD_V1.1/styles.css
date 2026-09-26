@@ -224,9 +224,7 @@ body {
   margin: 0 auto;
 
   padding:
-    0
-    var(--space-5)
-    var(--space-9);
+    0 var(--space-5) var(--space-9);
 
   line-height: 1.6;
 
@@ -258,11 +256,9 @@ p {
 h1 {
   margin-bottom: var(--space-5);
 
-  font-size: clamp(
-    1.7rem,
-    1.2rem + 2vw,
-    2.7rem
-  );
+  font-size: clamp(1.7rem,
+      1.2rem + 2vw,
+      2.7rem);
 
   line-height: 1.1;
 
@@ -276,11 +272,9 @@ h1 {
 h2 {
   margin-bottom: var(--space-3);
 
-  font-size: clamp(
-    1.25rem,
-    1.05rem + 0.7vw,
-    1.65rem
-  );
+  font-size: clamp(1.25rem,
+      1.05rem + 0.7vw,
+      1.65rem);
 
   line-height: 1.2;
 
@@ -371,15 +365,12 @@ textarea:focus-visible {
   margin-bottom: 0;
 
   padding:
-    var(--space-3)
-    0;
+    var(--space-3) 0;
 
   background:
-    linear-gradient(
-      to bottom,
+    linear-gradient(to bottom,
       rgba(0, 27, 26, 0.98),
-      rgba(0, 27, 26, 0.90)
-    );
+      rgba(0, 27, 26, 0.90));
 
   border-bottom: 1px solid var(--border);
 
@@ -469,13 +460,10 @@ textarea:focus-visible {
   max-width: 860px;
 
   padding:
-    112px
-    0
-    104px;
+    112px 0 104px;
 
   border-bottom:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 }
 
 
@@ -507,11 +495,9 @@ textarea:focus-visible {
 
   margin-bottom: var(--space-5);
 
-  font-size: clamp(
-    2.5rem,
-    5vw,
-    5rem
-  );
+  font-size: clamp(2.5rem,
+      5vw,
+      5rem);
 
   line-height: 0.98;
 
@@ -530,11 +516,9 @@ textarea:focus-visible {
 
   color: var(--text-secondary);
 
-  font-size: clamp(
-    1rem,
-    0.95rem + 0.25vw,
-    1.12rem
-  );
+  font-size: clamp(1rem,
+      0.95rem + 0.25vw,
+      1.12rem);
 
   line-height: 1.7;
 }
@@ -570,8 +554,7 @@ button,
   min-height: 42px;
 
   padding:
-    10px
-    18px;
+    10px 18px;
 
   border:
     1px solid transparent;
@@ -613,8 +596,7 @@ button:hover {
   color: var(--rich-black);
 
   box-shadow:
-    0 5px 18px
-    rgba(0, 223, 129, 0.10);
+    0 5px 18px rgba(0, 223, 129, 0.10);
 }
 
 .primary-btn:active,
@@ -652,12 +634,10 @@ button:active {
 
 .how-it-works-section {
   padding:
-    var(--space-9)
-    0;
+    var(--space-9) 0;
 
   border-bottom:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 }
 
 .section-heading {
@@ -668,7 +648,7 @@ button:active {
   max-width: 600px;
 }
 
-.section-heading > p:not(.section-label) {
+.section-heading>p:not(.section-label) {
   max-width: 650px;
 
   color: var(--text-secondary);
@@ -692,8 +672,7 @@ button:active {
   background-color: var(--border);
 
   border:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 }
 
 .process-step {
@@ -743,12 +722,10 @@ button:active {
 
 .recent-flies-section {
   padding:
-    var(--space-9)
-    0;
+    var(--space-9) 0;
 
   border-bottom:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 }
 
 
@@ -810,8 +787,7 @@ button:active {
   background-color: var(--surface);
 
   border:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   border-radius: var(--radius-lg);
 
@@ -883,17 +859,13 @@ button:active {
   max-width: 540px;
 
   margin:
-    var(--space-7)
-    0
-    var(--space-5);
+    var(--space-7) 0 var(--space-5);
 
   color: var(--text);
 
-  font-size: clamp(
-    1rem,
-    0.9rem + 0.3vw,
-    1.18rem
-  );
+  font-size: clamp(1rem,
+      0.9rem + 0.3vw,
+      1.18rem);
 
   font-weight: 600;
 
@@ -931,16 +903,14 @@ button:active {
   margin: 0;
 
   padding:
-    var(--space-7)
-    var(--space-5);
+    var(--space-7) var(--space-5);
 
   text-align: center;
 
   color: var(--text-muted);
 
   border:
-    1px dashed
-    var(--border);
+    1px dashed var(--border);
 
   border-radius: var(--radius-lg);
 }
@@ -952,12 +922,10 @@ button:active {
 
 .fly-structure-section {
   padding:
-    var(--space-9)
-    0;
+    var(--space-9) 0;
 
   border-bottom:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 }
 
 
@@ -1026,8 +994,7 @@ button:active {
   height: 1px;
 
   margin:
-    0
-    var(--space-3);
+    0 var(--space-3);
 
   background-color: var(--border-strong);
 }
@@ -1058,16 +1025,14 @@ button:active {
   max-width: 600px;
 
   margin:
-    var(--space-9)
-    auto;
+    var(--space-9) auto;
 
   padding: var(--space-7);
 
   background-color: var(--surface);
 
   border:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   border-radius: var(--radius-lg);
 }
@@ -1115,9 +1080,7 @@ button:active {
 
 #auth-status {
   margin:
-    var(--space-4)
-    0
-    0;
+    var(--space-4) 0 0;
 
   color: var(--text-muted);
 
@@ -1152,9 +1115,7 @@ label {
 
 .field-description {
   margin:
-    -4px
-    0
-    var(--space-3);
+    -4px 0 var(--space-3);
 
   color: var(--text-muted);
 
@@ -1173,14 +1134,12 @@ textarea {
   width: 100%;
 
   padding:
-    11px
-    13px;
+    11px 13px;
 
   margin-bottom: 0;
 
   border:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   border-radius: var(--radius-sm);
 
@@ -1223,8 +1182,7 @@ textarea:focus {
   background-color: var(--surface-2);
 
   box-shadow:
-    0 0 0 3px
-    rgba(0, 223, 129, 0.07);
+    0 0 0 3px rgba(0, 223, 129, 0.07);
 }
 
 
@@ -1257,8 +1215,7 @@ textarea:focus {
   margin: 0;
 
   padding:
-    4px
-    8px;
+    4px 8px;
 
   transform: translateY(-50%);
 
@@ -1288,9 +1245,7 @@ textarea:focus {
 
 .switch-auth {
   margin:
-    var(--space-4)
-    0
-    0;
+    var(--space-4) 0 0;
 
   color: var(--text-muted);
 
@@ -1314,20 +1269,16 @@ textarea:focus {
   max-width: 760px;
 
   margin:
-    var(--space-9)
-    auto;
+    var(--space-9) auto;
 
   padding:
-    var(--space-8)
-    0;
+    var(--space-8) 0;
 
   border-top:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   border-bottom:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 }
 
 .claim-section .section-heading {
@@ -1362,16 +1313,14 @@ textarea:focus {
   margin-bottom: var(--space-3);
 
   padding:
-    var(--space-7)
-    var(--space-5);
+    var(--space-7) var(--space-5);
 
   text-align: center;
 
   background-color: var(--surface);
 
   border:
-    1px dashed
-    var(--border-strong);
+    1px dashed var(--border-strong);
 
   border-radius: var(--radius-md);
 
@@ -1420,14 +1369,12 @@ textarea:focus {
   margin-bottom: var(--space-4);
 
   padding:
-    var(--space-3)
-    var(--space-4);
+    var(--space-3) var(--space-4);
 
   background-color: var(--pine);
 
   border-left:
-    3px solid
-    var(--mountain-meadow);
+    3px solid var(--mountain-meadow);
 
   border-radius: var(--radius-sm);
 
@@ -1449,12 +1396,10 @@ textarea:focus {
 
 .my-flies-section {
   padding:
-    var(--space-9)
-    0;
+    var(--space-9) 0;
 
   border-bottom:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 }
 
 
@@ -1488,8 +1433,7 @@ textarea:focus {
   background-color: var(--surface);
 
   border:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   border-radius: var(--radius-lg);
 
@@ -1551,8 +1495,7 @@ textarea:focus {
   border: none;
 
   border-bottom:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   border-radius: 0;
 }
@@ -1564,9 +1507,7 @@ textarea:focus {
 
 .final-cta-section {
   padding:
-    112px
-    0
-    80px;
+    112px 0 80px;
 
   text-align: center;
 }
@@ -1574,11 +1515,9 @@ textarea:focus {
 .final-cta-section h2 {
   margin-bottom: var(--space-7);
 
-  font-size: clamp(
-    2rem,
-    4vw,
-    3.5rem
-  );
+  font-size: clamp(2rem,
+      4vw,
+      3.5rem);
 
   line-height: 1;
 
@@ -1646,8 +1585,7 @@ body:has(#feed-list) {
   background-color: var(--surface);
 
   border:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   border-radius: var(--radius-lg);
 
@@ -1702,8 +1640,7 @@ body:has(#feed-list) {
   border: none;
 
   border-bottom:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   border-radius: 0;
 
@@ -1738,8 +1675,7 @@ body:has(#feed-list) {
   background-color: var(--surface-2);
 
   border-bottom:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   color: var(--text-muted);
 
@@ -1755,17 +1691,13 @@ body:has(#feed-list) {
   margin: 0;
 
   padding:
-    var(--space-5)
-    var(--space-5)
-    var(--space-6);
+    var(--space-5) var(--space-5) var(--space-6);
 
   color: var(--text);
 
-  font-size: clamp(
-    1rem,
-    0.94rem + 0.25vw,
-    1.16rem
-  );
+  font-size: clamp(1rem,
+      0.94rem + 0.25vw,
+      1.16rem);
 
   font-weight: 600;
 
@@ -1785,9 +1717,7 @@ body:has(#feed-list) {
   max-width: var(--content-width);
 
   margin:
-    var(--space-4)
-    auto
-    0;
+    var(--space-4) auto 0;
 }
 
 
@@ -1802,11 +1732,9 @@ body:has(#feed-list) {
 .fly-header h1 {
   margin-bottom: var(--space-2);
 
-  font-size: clamp(
-    1.45rem,
-    1.15rem + 1vw,
-    2rem
-  );
+  font-size: clamp(1.45rem,
+      1.15rem + 1vw,
+      2rem);
 
   line-height: 1.2;
 
@@ -1828,12 +1756,10 @@ body:has(#feed-list) {
 
 .fly-section {
   padding:
-    var(--space-6)
-    0;
+    var(--space-6) 0;
 
   border-bottom:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 }
 
 .fly-section:first-child {
@@ -1887,8 +1813,7 @@ body:has(#feed-list) {
   background-color: var(--surface);
 
   border:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   border-radius: var(--radius-lg);
 }
@@ -2184,8 +2109,7 @@ body:has(#feed-list) {
   padding-bottom: var(--space-6);
 
   border-bottom:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 }
 
 #avatar {
@@ -2202,8 +2126,7 @@ body:has(#feed-list) {
   background-color: var(--basil);
 
   border:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   border-radius: 50%;
 }
@@ -2281,9 +2204,7 @@ body:has(#feed-list) {
 
   .hero-section {
     padding:
-      88px
-      0
-      80px;
+      88px 0 80px;
   }
 
   .how-it-works-section,
@@ -2291,8 +2212,7 @@ body:has(#feed-list) {
   .fly-structure-section,
   .my-flies-section {
     padding:
-      72px
-      0;
+      72px 0;
   }
 
 }
@@ -2335,17 +2255,13 @@ body:has(#feed-list) {
 
   .hero-section {
     padding:
-      72px
-      0
-      64px;
+      72px 0 64px;
   }
 
   .hero-section h1 {
-    font-size: clamp(
-      2.25rem,
-      12vw,
-      3.5rem
-    );
+    font-size: clamp(2.25rem,
+        12vw,
+        3.5rem);
   }
 
   .hero-description {
@@ -2392,8 +2308,7 @@ body:has(#feed-list) {
   .fly-structure-section,
   .my-flies-section {
     padding:
-      64px
-      0;
+      64px 0;
   }
 
 
@@ -2415,12 +2330,10 @@ body:has(#feed-list) {
     width: 100%;
 
     padding:
-      var(--space-3)
-      0;
+      var(--space-3) 0;
 
     border-bottom:
-      1px solid
-      var(--border);
+      1px solid var(--border);
   }
 
   .fly-structure-line {
@@ -2434,8 +2347,7 @@ body:has(#feed-list) {
 
   .auth-section {
     margin:
-      64px
-      0;
+      64px 0;
 
     padding: var(--space-5);
   }
@@ -2447,12 +2359,10 @@ body:has(#feed-list) {
 
   .claim-section {
     margin:
-      64px
-      0;
+      64px 0;
 
     padding:
-      64px
-      0;
+      64px 0;
   }
 
 
@@ -2462,9 +2372,7 @@ body:has(#feed-list) {
 
   .final-cta-section {
     padding:
-      80px
-      0
-      56px;
+      80px 0 56px;
   }
 
 }
@@ -2497,9 +2405,7 @@ body:has(#feed-list) {
 
   .hero-section {
     padding:
-      60px
-      0
-      56px;
+      60px 0 56px;
   }
 
   .hero-section h1 {
@@ -2530,8 +2436,7 @@ body:has(#feed-list) {
 
   .claim-section {
     padding:
-      56px
-      0;
+      56px 0;
   }
 
 
@@ -2551,8 +2456,7 @@ body:has(#feed-list) {
 
   .fly-section {
     padding:
-      var(--space-5)
-      0;
+      var(--space-5) 0;
   }
 
   .fly-section p {
@@ -2653,6 +2557,293 @@ body:has(#feed-list) {
   .fly-section p,
   h1 {
     color: black;
+  }
+
+}
+
+/* =========================================================
+   INTD — FEED PAGE
+   ========================================================= */
+
+.feed-page {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 56px 24px 100px;
+}
+
+
+/* =========================
+   FEED HEADER
+   ========================= */
+
+.feed-header {
+  max-width: 720px;
+  margin-bottom: 48px;
+}
+
+.feed-header .eyebrow {
+  margin-bottom: 12px;
+}
+
+.feed-header h1 {
+  margin: 0 0 14px;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+.feed-intro {
+  max-width: 620px;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+
+/* =========================
+   FEED GRID
+   ========================= */
+
+.feed-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+
+/* =========================
+   FLY CARD
+   ========================= */
+
+.feed-card {
+  min-width: 0;
+  overflow: hidden;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  background: var(--surface);
+
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.feed-card:hover {
+  border-color: var(--green);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+}
+
+
+.feed-card-link {
+  display: block;
+  height: 100%;
+
+  color: inherit;
+  text-decoration: none;
+}
+
+
+/* =========================
+   CARD IMAGE
+   ========================= */
+
+.feed-card-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+
+  overflow: hidden;
+
+  background: var(--surface-soft);
+}
+
+.feed-card-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  transition: transform 300ms ease;
+}
+
+.feed-card:hover .feed-card-image img {
+  transform: scale(1.025);
+}
+
+
+.feed-card-no-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feed-card-no-image span {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+}
+
+
+/* =========================
+   CARD CONTENT
+   ========================= */
+
+.feed-card-content {
+  padding: 22px 22px 24px;
+}
+
+
+.feed-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 13px;
+
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+
+  color: var(--green);
+}
+
+
+.feed-card-meta span:last-child {
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+
+.feed-card-claim {
+  margin: 0 0 12px;
+
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+
+  color: var(--text);
+}
+
+
+.feed-card-description {
+  margin: 0;
+
+  color: var(--text-muted);
+
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+
+.feed-card-read {
+  display: inline-block;
+
+  margin-top: 20px;
+
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  color: var(--text);
+
+  transition: color 180ms ease;
+}
+
+.feed-card:hover .feed-card-read {
+  color: var(--green);
+}
+
+
+/* =========================
+   FEED STATES
+   ========================= */
+
+.feed-state {
+  grid-column: 1 / -1;
+
+  padding: 64px 24px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  text-align: center;
+}
+
+.feed-state h2 {
+  margin: 8px 0 10px;
+}
+
+.feed-state p {
+  max-width: 500px;
+  margin: 0 auto 18px;
+
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.feed-state .eyebrow {
+  margin-bottom: 8px;
+  color: var(--green);
+}
+
+.text-link {
+  color: var(--green);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 699px) {
+
+  .feed-page {
+    padding: 40px 18px 72px;
+  }
+
+  .feed-header {
+    margin-bottom: 32px;
+  }
+
+  .feed-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .feed-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .feed-card-content {
+    padding: 18px 18px 20px;
+  }
+
+}
+
+
+@media (max-width: 420px) {
+
+  .feed-page {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .feed-card-claim {
+    font-size: 1.1rem;
   }
 
 }
