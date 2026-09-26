@@ -2,96 +2,251 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>It's Not That Deep — Fly</title>
-    <link rel="stylesheet" href="styles.css?v=2" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>It's Not That Deep — Fly</title>
+  <link rel="stylesheet" href="styles.css?v=2" />
 </head>
 
 <body>
 
-    <nav class="site-nav">
-        <a href="index.html">Home</a>
-        <a href="feed.html">Feed</a>
-        <a href="profile.html">Profile</a>
-    </nav>
+  <nav class="site-nav">
+    <a href="index.html">Home</a>
+    <a href="feed.html">Feed</a>
+    <a href="profile.html">Profile</a>
+  </nav>
 
-    <a href="feed.html" class="back-link">← Back to Feed</a>
+  <a href="feed.html" class="back-link">← Back to Feed</a>
 
-    <main id="fly-container">
-        <p>Loading Fly...</p>
-    </main>
+  <main id="fly-container">
+    <p>Loading Fly...</p>
+  </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <div class="lightbox-overlay" id="lightbox-overlay">
+    <div class="lightbox-content">
+      <button class="lightbox-close" id="lightbox-close">&times;</button>
+      <img id="lightbox-image" src="" alt="Fly image" />
+      <button class="lightbox-arrow prev" id="lightbox-prev">‹</button>
+      <button class="lightbox-arrow next" id="lightbox-next">›</button>
+      <span class="lightbox-counter" id="lightbox-counter"></span>
+    </div>
+  </div>
 
-    <script>
-        const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        const supabaseClient = window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_ANON_KEY,
-        );
+  <script>
+    const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
 
-        async function loadFly() {
-            const params = new URLSearchParams(window.location.search);
-            const flyId = params.get("id");
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY,
+    );
 
-            const container = document.getElementById("fly-container");
+    let images = [];
+    let galleryIndex = 0;
+    let lightboxIndex = 0;
 
-            if (!flyId) {
-                container.innerHTML = "<p>Fly not found.</p>";
-                return;
-            }
+    const lightboxOverlay = document.getElementById("lightbox-overlay");
+    const lightboxImage = document.getElementById("lightbox-image");
+    const lightboxCounter = document.getElementById("lightbox-counter");
+    const lightboxPrev = document.getElementById("lightbox-prev");
+    const lightboxNext = document.getElementById("lightbox-next");
+    const lightboxClose = document.getElementById("lightbox-close");
 
-            const { data, error } = await supabaseClient
-                .rpc("get_public_fly", { fly_id: flyId })
-                .single();
+    function openLightbox(index) {
+      lightboxIndex = index;
+      updateLightbox();
+      lightboxOverlay.classList.add("open");
+    }
 
-            if (error || !data) {
-                container.innerHTML = "<p>Fly not found.</p>";
-                return;
-            }
+    function closeLightbox() {
+      lightboxOverlay.classList.remove("open");
+    }
 
-            container.innerHTML = `
-                <article class="fly-page">
+    function updateLightbox() {
+      lightboxImage.src = images[lightboxIndex];
+      const showArrows = images.length > 1;
+      lightboxPrev.style.display = showArrows ? "flex" : "none";
+      lightboxNext.style.display = showArrows ? "flex" : "none";
+      lightboxCounter.style.display = showArrows ? "block" : "none";
+      lightboxCounter.textContent = `${lightboxIndex + 1} / ${images.length}`;
+    }
 
-                    <section class="fly-section">
-                        <h2>Claim</h2>
-                        <p>${data.claim || ""}</p>
-                    </section>
+    lightboxPrev.addEventListener("click", () => {
+      lightboxIndex = (lightboxIndex - 1 + images.length) % images.length;
+      updateLightbox();
+    });
 
-                    <section class="fly-section">
-                        <h2>Description</h2>
-                        <p>${data.description || ""}</p>
-                    </section>
+    lightboxNext.addEventListener("click", () => {
+      lightboxIndex = (lightboxIndex + 1) % images.length;
+      updateLightbox();
+    });
 
-                    <section class="fly-section">
-                        <h2>Evidence</h2>
-                        <p>${data.evidence || ""}</p>
-                    </section>
+    lightboxClose.addEventListener("click", closeLightbox);
 
-                    <section class="fly-section">
-                        <h2>Full Story</h2>
-                        <p>${data.full_story || ""}</p>
-                    </section>
+    lightboxOverlay.addEventListener("click", (e) => {
+      if (e.target === lightboxOverlay) closeLightbox();
+    });
 
-                    <section class="fly-section">
-                        <h2>Conclusion</h2>
-                        <p>${data.conclusion || ""}</p>
-                    </section>
+    document.addEventListener("keydown", (e) => {
+      if (!lightboxOverlay.classList.contains("open")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft" && images.length > 1) {
+        lightboxIndex = (lightboxIndex - 1 + images.length) % images.length;
+        updateLightbox();
+      }
+      if (e.key === "ArrowRight" && images.length > 1) {
+        lightboxIndex = (lightboxIndex + 1) % images.length;
+        updateLightbox();
+      }
+    });
 
-                    <section class="fly-section">
-                        <h2>Impact</h2>
-                        <p>${data.impact || ""}</p>
-                    </section>
+    function updateGallery(track, dotsContainer) {
+      track.style.transform = `translateX(-${galleryIndex * 100}%)`;
+      dotsContainer.querySelectorAll(".fly-gallery-dot").forEach((dot, i) => {
+        dot.classList.toggle("active", i === galleryIndex);
+      });
+    }
 
-                </article>
-            `;
-        }
+    function buildGalleryHtml() {
+      if (images.length === 0) return "";
 
-        loadFly();
-    </script>
+      const slides = images
+        .map((url) => `<img src="${url}" alt="Fly image" />`)
+        .join("");
+
+      const dots = images
+        .map((_, i) => `<button class="fly-gallery-dot" data-index="${i}"></button>`)
+        .join("");
+
+      const arrows =
+        images.length > 1
+          ? `<button class="fly-gallery-arrow prev" id="gallery-prev">‹</button>
+             <button class="fly-gallery-arrow next" id="gallery-next">›</button>`
+          : "";
+
+      return `
+        <div class="fly-gallery" id="fly-gallery">
+          <div class="fly-gallery-track" id="fly-gallery-track">${slides}</div>
+          ${arrows}
+          ${images.length > 1 ? `<div class="fly-gallery-dots" id="fly-gallery-dots">${dots}</div>` : ""}
+        </div>
+      `;
+    }
+
+    function wireGallery() {
+      if (images.length === 0) return;
+
+      const track = document.getElementById("fly-gallery-track");
+      const dotsContainer = document.getElementById("fly-gallery-dots");
+
+      track.querySelectorAll("img").forEach((img, i) => {
+        img.addEventListener("click", () => openLightbox(i));
+      });
+
+      if (images.length > 1) {
+        dotsContainer.querySelectorAll(".fly-gallery-dot").forEach((dot, i) => {
+          dot.addEventListener("click", () => {
+            galleryIndex = i;
+            updateGallery(track, dotsContainer);
+          });
+        });
+
+        document.getElementById("gallery-prev").addEventListener("click", () => {
+          galleryIndex = (galleryIndex - 1 + images.length) % images.length;
+          updateGallery(track, dotsContainer);
+        });
+
+        document.getElementById("gallery-next").addEventListener("click", () => {
+          galleryIndex = (galleryIndex + 1) % images.length;
+          updateGallery(track, dotsContainer);
+        });
+
+        updateGallery(track, dotsContainer);
+      }
+    }
+
+    async function loadFly() {
+      const params = new URLSearchParams(window.location.search);
+      const flyId = params.get("id");
+
+      const container = document.getElementById("fly-container");
+
+      if (!flyId) {
+        container.innerHTML = "<p>Fly not found.</p>";
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .rpc("get_public_fly", { fly_id: flyId })
+        .single();
+
+      if (error || !data) {
+        container.innerHTML = "<p>Fly not found.</p>";
+        return;
+      }
+
+      if (data.evidence_image_path) {
+        const { data: publicUrlData } = supabaseClient.storage
+          .from("evidence")
+          .getPublicUrl(data.evidence_image_path);
+        images.push(publicUrlData.publicUrl);
+      }
+
+      if (data.image_urls && data.image_urls.length > 0) {
+        images.push(...data.image_urls);
+      }
+
+      const formattedDate = new Date(data.created_at).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+      container.innerHTML = `
+        <article class="fly-page">
+
+          ${buildGalleryHtml()}
+
+          <div class="fly-header">
+            <h1>${data.claim || ""}</h1>
+            <p class="fly-meta">Published ${formattedDate}</p>
+          </div>
+
+          <section class="fly-section">
+            <h2>Description</h2>
+            <p>${data.description || ""}</p>
+          </section>
+
+          <section class="fly-section">
+            <h2>Evidence</h2>
+            <p>${data.evidence || ""}</p>
+          </section>
+
+          <section class="fly-section">
+            <h2>Full Story</h2>
+            <p>${data.full_story || ""}</p>
+          </section>
+
+          <section class="fly-section">
+            <h2>Conclusion</h2>
+            <p>${data.conclusion || ""}</p>
+          </section>
+
+          <section class="fly-section">
+            <h2>Impact</h2>
+            <p>${data.impact || ""}</p>
+          </section>
+
+        </article>
+      `;
+
+      wireGallery();
+    }
+
+    loadFly();
+  </script>
 
 </body>
 
