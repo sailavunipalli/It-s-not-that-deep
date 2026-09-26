@@ -33,6 +33,11 @@
     <label for="claim-image">Replace Evidence Photo (optional)</label>
     <input type="file" id="claim-image" accept="image/*" />
 
+    <label>Additional Photos (up to 5 total)</label>
+    <div id="existing-images"></div>
+    <input type="file" id="new-images" accept="image/*" multiple />
+    <p id="image-limit-error" class="error-text" style="display: none"></p>
+
     <label for="full-story-text">Full Story</label>
     <textarea id="full-story-text" rows="5"></textarea>
 
@@ -68,9 +73,34 @@
     const conclusionText = document.getElementById("conclusion-text");
     const impactText = document.getElementById("impact-text");
     const output = document.getElementById("output");
+    const existingImagesDiv = document.getElementById("existing-images");
+    const newImagesInput = document.getElementById("new-images");
+    const imageLimitError = document.getElementById("image-limit-error");
 
     let currentImagePath = null;
     let currentUserId = null;
+    let currentImageUrls = [];
+
+    function renderExistingImages() {
+      existingImagesDiv.innerHTML = "";
+      currentImageUrls.forEach((url, index) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "image-thumb-wrapper";
+        wrapper.innerHTML = `
+          <img src="${url}" alt="Fly image" />
+          <button type="button" class="remove-image-btn" data-index="${index}">×</button>
+        `;
+        existingImagesDiv.appendChild(wrapper);
+      });
+    }
+
+    existingImagesDiv.addEventListener("click", (e) => {
+      if (e.target.classList.contains("remove-image-btn")) {
+        const index = parseInt(e.target.dataset.index, 10);
+        currentImageUrls.splice(index, 1);
+        renderExistingImages();
+      }
+    });
 
     async function loadFly() {
       const {
@@ -91,7 +121,7 @@
 
       const { data, error } = await supabaseClient
         .from("flies")
-        .select("claim, description, evidence, full_story, conclusion, impact, evidence_image_path")
+        .select("claim, description, evidence, full_story, conclusion, impact, evidence_image_path, image_urls")
         .eq("id", flyId)
         .single();
 
@@ -108,6 +138,8 @@
       impactText.value = data.impact || "";
 
       currentImagePath = data.evidence_image_path || null;
+      currentImageUrls = data.image_urls || [];
+      renderExistingImages();
 
       if (currentImagePath) {
         const { data: signedData } = await supabaseClient.storage
@@ -121,50 +153,6 @@
         document.getElementById("current-image").textContent = "No photo attached.";
       }
     }
-
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      const newImageFile = document.getElementById("claim-image").files[0];
-      let imagePath = currentImagePath;
-
-      if (newImageFile) {
-        const filePath = `${currentUserId}/${Date.now()}-${newImageFile.name}`;
-        const { error: uploadError } = await supabaseClient.storage
-          .from("evidence")
-          .upload(filePath, newImageFile);
-
-        if (uploadError) {
-          output.textContent = "Image upload failed: " + uploadError.message;
-          return;
-        }
-
-        if (currentImagePath) {
-          await supabaseClient.storage.from("evidence").remove([currentImagePath]);
-        }
-
-        imagePath = filePath;
-      }
-
-      const { error } = await supabaseClient
-        .from("flies")
-        .update({
-          claim: claimText.value,
-          description: descriptionText.value,
-          evidence: evidenceText.value,
-          full_story: fullStoryText.value,
-          conclusion: conclusionText.value,
-          impact: impactText.value,
-          evidence_image_path: imagePath,
-        })
-        .eq("id", flyId);
-
-      if (error) {
-        output.textContent = "Error saving: " + error.message;
-      } else {
-        output.textContent = "Saved!";
-      }
-    });
 
     document.getElementById("publish-btn").addEventListener("click", async () => {
       const allFilled =
@@ -189,6 +177,85 @@
         output.textContent = "Error publishing: " + error.message;
       } else {
         output.textContent = "Published! This Fly is now visible on the public Feed.";
+      }
+    });
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      imageLimitError.style.display = "none";
+
+      const newFiles = Array.from(newImagesInput.files);
+      const totalCount = currentImageUrls.length + newFiles.length;
+
+      if (totalCount > 5) {
+        imageLimitError.textContent = `You have ${currentImageUrls.length} existing photo(s) and selected ${newFiles.length} new one(s) — that's ${totalCount} total. Max is 5. Remove some before saving.`;
+        imageLimitError.style.display = "block";
+        return;
+      }
+
+      const newImageFile = document.getElementById("claim-image").files[0];
+      let imagePath = currentImagePath;
+
+      if (newImageFile) {
+        const filePath = `${currentUserId}/${Date.now()}-${newImageFile.name}`;
+        const { error: uploadError } = await supabaseClient.storage
+          .from("evidence")
+          .upload(filePath, newImageFile);
+
+        if (uploadError) {
+          output.textContent = "Image upload failed: " + uploadError.message;
+          return;
+        }
+
+        if (currentImagePath) {
+          await supabaseClient.storage.from("evidence").remove([currentImagePath]);
+        }
+
+        imagePath = filePath;
+      }
+
+      const uploadedUrls = [];
+      for (const file of newFiles) {
+        const filePath = `${currentUserId}/${Date.now()}-${file.name}`;
+        const { error: uploadError } = await supabaseClient.storage
+          .from("fly-images")
+          .upload(filePath, file);
+
+        if (uploadError) {
+          output.textContent = "Image upload failed: " + uploadError.message;
+          return;
+        }
+
+        const { data: publicUrlData } = supabaseClient.storage
+          .from("fly-images")
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(publicUrlData.publicUrl);
+      }
+
+      const finalImageUrls = [...currentImageUrls, ...uploadedUrls];
+
+      const { error } = await supabaseClient
+        .from("flies")
+        .update({
+          claim: claimText.value,
+          description: descriptionText.value,
+          evidence: evidenceText.value,
+          full_story: fullStoryText.value,
+          conclusion: conclusionText.value,
+          impact: impactText.value,
+          evidence_image_path: imagePath,
+          image_urls: finalImageUrls,
+        })
+        .eq("id", flyId);
+
+      if (error) {
+        output.textContent = "Error saving: " + error.message;
+      } else {
+        output.textContent = "Saved!";
+        currentImageUrls = finalImageUrls;
+        newImagesInput.value = "";
+        renderExistingImages();
       }
     });
 
