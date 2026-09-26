@@ -1,902 +1,244 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>It's Not That Deep — Fly</title>
-
   <link rel="stylesheet" href="styles.css?v=4" />
 </head>
-
 <body>
 
-  <!-- =========================
-       NAVIGATION
-       ========================= -->
-
   <nav class="site-nav">
-
-    <a href="index.html" class="site-logo">
-      INTD
-    </a>
-
+    <a href="index.html" class="site-logo">INTD</a>
     <div class="site-nav-links">
       <a href="index.html">Home</a>
       <a href="feed.html">Feed</a>
       <a href="profile.html">Profile</a>
     </div>
-
   </nav>
 
-
-  <!-- =========================
-       BACK TO FEED
-       ========================= -->
-
   <main class="fly-wrapper">
-
-    <a href="feed.html" class="back-link">
-      ← Back to Flies
-    </a>
-
-
-    <!-- =========================
-         FLY
-         ========================= -->
-
+    <a href="feed.html" class="back-link">← Back to Flies</a>
     <div id="fly-container">
-
-      <div class="fly-loading">
-        Loading Fly...
-      </div>
-
+      <div class="fly-loading">Loading Fly...</div>
     </div>
-
   </main>
 
-
-  <!-- =========================
-       LIGHTBOX
-       ========================= -->
-
-  <div
-    class="lightbox-overlay"
-    id="lightbox-overlay"
-    aria-hidden="true"
-  >
-
+  <div class="lightbox-overlay" id="lightbox-overlay" aria-hidden="true">
     <div class="lightbox-content">
-
-      <button
-        class="lightbox-close"
-        id="lightbox-close"
-        aria-label="Close image"
-      >
-        ×
-      </button>
-
-      <img
-        id="lightbox-image"
-        src=""
-        alt="Fly evidence"
-      />
-
-      <button
-        class="lightbox-arrow prev"
-        id="lightbox-prev"
-        aria-label="Previous image"
-      >
-        ‹
-      </button>
-
-      <button
-        class="lightbox-arrow next"
-        id="lightbox-next"
-        aria-label="Next image"
-      >
-        ›
-      </button>
-
-      <span
-        class="lightbox-counter"
-        id="lightbox-counter"
-      ></span>
-
+      <button class="lightbox-close" id="lightbox-close" aria-label="Close image">×</button>
+      <img id="lightbox-image" src="" alt="Fly evidence" />
+      <button class="lightbox-arrow prev" id="lightbox-prev" aria-label="Previous image">‹</button>
+      <button class="lightbox-arrow next" id="lightbox-next" aria-label="Next image">›</button>
+      <span class="lightbox-counter" id="lightbox-counter"></span>
     </div>
-
   </div>
 
-
-  <!-- =========================
-       SUPABASE
-       ========================= -->
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
   <script>
-
     const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
-
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-      );
-
-
-    /* =====================================================
-       GALLERY
-       ===================================================== */
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let images = [];
     let galleryIndex = 0;
     let lightboxIndex = 0;
 
-
-    const lightboxOverlay =
-      document.getElementById("lightbox-overlay");
-
-    const lightboxImage =
-      document.getElementById("lightbox-image");
-
-    const lightboxCounter =
-      document.getElementById("lightbox-counter");
-
-    const lightboxPrev =
-      document.getElementById("lightbox-prev");
-
-    const lightboxNext =
-      document.getElementById("lightbox-next");
-
-    const lightboxClose =
-      document.getElementById("lightbox-close");
-
+    const lightboxOverlay = document.getElementById("lightbox-overlay");
+    const lightboxImage = document.getElementById("lightbox-image");
+    const lightboxCounter = document.getElementById("lightbox-counter");
+    const lightboxPrev = document.getElementById("lightbox-prev");
+    const lightboxNext = document.getElementById("lightbox-next");
+    const lightboxClose = document.getElementById("lightbox-close");
 
     function openLightbox(index) {
-
       lightboxIndex = index;
-
       updateLightbox();
-
       lightboxOverlay.classList.add("open");
-
-      lightboxOverlay.setAttribute(
-        "aria-hidden",
-        "false"
-      );
-
+      lightboxOverlay.setAttribute("aria-hidden", "false");
       document.body.classList.add("lightbox-open");
-
     }
-
 
     function closeLightbox() {
-
       lightboxOverlay.classList.remove("open");
-
-      lightboxOverlay.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
+      lightboxOverlay.setAttribute("aria-hidden", "true");
       document.body.classList.remove("lightbox-open");
-
     }
-
 
     function updateLightbox() {
-
       if (!images.length) return;
-
-      lightboxImage.src =
-        images[lightboxIndex];
-
-      const showControls =
-        images.length > 1;
-
-      lightboxPrev.style.display =
-        showControls ? "flex" : "none";
-
-      lightboxNext.style.display =
-        showControls ? "flex" : "none";
-
-      lightboxCounter.style.display =
-        showControls ? "block" : "none";
-
-      lightboxCounter.textContent =
-        `${lightboxIndex + 1} / ${images.length}`;
-
+      lightboxImage.src = images[lightboxIndex];
+      const showControls = images.length > 1;
+      lightboxPrev.style.display = showControls ? "flex" : "none";
+      lightboxNext.style.display = showControls ? "flex" : "none";
+      lightboxCounter.style.display = showControls ? "block" : "none";
+      lightboxCounter.textContent = `${lightboxIndex + 1} / ${images.length}`;
     }
 
+    lightboxPrev.addEventListener("click", () => {
+      lightboxIndex = (lightboxIndex - 1 + images.length) % images.length;
+      updateLightbox();
+    });
+    lightboxNext.addEventListener("click", () => {
+      lightboxIndex = (lightboxIndex + 1) % images.length;
+      updateLightbox();
+    });
+    lightboxClose.addEventListener("click", closeLightbox);
+    lightboxOverlay.addEventListener("click", (e) => { if (e.target === lightboxOverlay) closeLightbox(); });
 
-    lightboxPrev.addEventListener(
-      "click",
-      () => {
-
-        lightboxIndex =
-          (lightboxIndex - 1 + images.length)
-          % images.length;
-
+    document.addEventListener("keydown", (e) => {
+      if (!lightboxOverlay.classList.contains("open")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft" && images.length > 1) {
+        lightboxIndex = (lightboxIndex - 1 + images.length) % images.length;
         updateLightbox();
-
       }
-    );
-
-
-    lightboxNext.addEventListener(
-      "click",
-      () => {
-
-        lightboxIndex =
-          (lightboxIndex + 1)
-          % images.length;
-
+      if (e.key === "ArrowRight" && images.length > 1) {
+        lightboxIndex = (lightboxIndex + 1) % images.length;
         updateLightbox();
-
       }
-    );
+    });
 
-
-    lightboxClose.addEventListener(
-      "click",
-      closeLightbox
-    );
-
-
-    lightboxOverlay.addEventListener(
-      "click",
-      (event) => {
-
-        if (
-          event.target === lightboxOverlay
-        ) {
-          closeLightbox();
-        }
-
-      }
-    );
-
-
-    document.addEventListener(
-      "keydown",
-      (event) => {
-
-        if (
-          !lightboxOverlay.classList.contains("open")
-        ) {
-          return;
-        }
-
-        if (event.key === "Escape") {
-          closeLightbox();
-        }
-
-        if (
-          event.key === "ArrowLeft" &&
-          images.length > 1
-        ) {
-
-          lightboxIndex =
-            (lightboxIndex - 1 + images.length)
-            % images.length;
-
-          updateLightbox();
-
-        }
-
-        if (
-          event.key === "ArrowRight" &&
-          images.length > 1
-        ) {
-
-          lightboxIndex =
-            (lightboxIndex + 1)
-            % images.length;
-
-          updateLightbox();
-
-        }
-
-      }
-    );
-
-
-    /* =====================================================
-       GALLERY
-       ===================================================== */
-
-    function updateGallery(
-      track,
-      dotsContainer
-    ) {
-
-      track.style.transform =
-        `translateX(-${galleryIndex * 100}%)`;
-
-
+    function updateGallery(track, dotsContainer) {
+      track.style.transform = `translateX(-${galleryIndex * 100}%)`;
       if (!dotsContainer) return;
-
-
-      dotsContainer
-        .querySelectorAll(".fly-gallery-dot")
-        .forEach((dot, index) => {
-
-          dot.classList.toggle(
-            "active",
-            index === galleryIndex
-          );
-
-        });
-
+      dotsContainer.querySelectorAll(".fly-gallery-dot").forEach((dot, i) => dot.classList.toggle("active", i === galleryIndex));
     }
-
 
     function buildGalleryHtml() {
-
-      if (!images.length) {
-        return "";
-      }
-
-
-      const slides =
-        images
-          .map(
-            (url, index) => `
-              <img
-                src="${url}"
-                alt="Evidence image ${index + 1}"
-                loading="${index === 0 ? "eager" : "lazy"}"
-              />
-            `
-          )
-          .join("");
-
-
-      const dots =
-        images
-          .map(
-            (_, index) => `
-              <button
-                class="fly-gallery-dot"
-                data-index="${index}"
-                aria-label="View image ${index + 1}"
-              ></button>
-            `
-          )
-          .join("");
-
-
-      const arrows =
-        images.length > 1
-          ? `
-              <button
-                class="fly-gallery-arrow prev"
-                id="gallery-prev"
-                aria-label="Previous image"
-              >
-                ‹
-              </button>
-
-              <button
-                class="fly-gallery-arrow next"
-                id="gallery-next"
-                aria-label="Next image"
-              >
-                ›
-              </button>
-            `
-          : "";
-
-
+      if (!images.length) return "";
+      const slides = images.map((url, i) => `<img src="${url}" alt="Evidence image ${i + 1}" loading="${i === 0 ? "eager" : "lazy"}" />`).join("");
+      const dots = images.map((_, i) => `<button class="fly-gallery-dot" data-index="${i}" aria-label="View image ${i + 1}"></button>`).join("");
+      const arrows = images.length > 1
+        ? `<button class="fly-gallery-arrow prev" id="gallery-prev" aria-label="Previous image">‹</button>
+           <button class="fly-gallery-arrow next" id="gallery-next" aria-label="Next image">›</button>`
+        : "";
       return `
-        <div
-          class="fly-gallery"
-          id="fly-gallery"
-        >
-
-          <div
-            class="fly-gallery-track"
-            id="fly-gallery-track"
-          >
-            ${slides}
-          </div>
-
+        <div class="fly-gallery" id="fly-gallery">
+          <div class="fly-gallery-track" id="fly-gallery-track">${slides}</div>
           ${arrows}
-
-          ${
-            images.length > 1
-              ? `
-                <div
-                  class="fly-gallery-dots"
-                  id="fly-gallery-dots"
-                >
-                  ${dots}
-                </div>
-              `
-              : ""
-          }
-
-        </div>
-      `;
-
+          ${images.length > 1 ? `<div class="fly-gallery-dots" id="fly-gallery-dots">${dots}</div>` : ""}
+        </div>`;
     }
-
 
     function wireGallery() {
+      if (!images.length) return;
+      const track = document.getElementById("fly-gallery-track");
+      const dotsContainer = document.getElementById("fly-gallery-dots");
 
-      if (!images.length) {
-        return;
-      }
+      track.querySelectorAll("img").forEach((img, i) => img.addEventListener("click", () => openLightbox(i)));
 
+      if (images.length <= 1) return;
 
-      const track =
-        document.getElementById(
-          "fly-gallery-track"
-        );
-
-      const dotsContainer =
-        document.getElementById(
-          "fly-gallery-dots"
-        );
-
-
-      track
-        .querySelectorAll("img")
-        .forEach((img, index) => {
-
-          img.addEventListener(
-            "click",
-            () => openLightbox(index)
-          );
-
-        });
-
-
-      if (images.length <= 1) {
-        return;
-      }
-
-
-      dotsContainer
-        .querySelectorAll(".fly-gallery-dot")
-        .forEach((dot, index) => {
-
-          dot.addEventListener(
-            "click",
-            () => {
-
-              galleryIndex = index;
-
-              updateGallery(
-                track,
-                dotsContainer
-              );
-
-            }
-          );
-
-        });
-
-
-      document
-        .getElementById("gallery-prev")
-        .addEventListener(
-          "click",
-          () => {
-
-            galleryIndex =
-              (galleryIndex - 1 + images.length)
-              % images.length;
-
-            updateGallery(
-              track,
-              dotsContainer
-            );
-
-          }
-        );
-
-
-      document
-        .getElementById("gallery-next")
-        .addEventListener(
-          "click",
-          () => {
-
-            galleryIndex =
-              (galleryIndex + 1)
-              % images.length;
-
-            updateGallery(
-              track,
-              dotsContainer
-            );
-
-          }
-        );
-
-
-      updateGallery(
-        track,
-        dotsContainer
-      );
-
+      dotsContainer.querySelectorAll(".fly-gallery-dot").forEach((dot, i) => {
+        dot.addEventListener("click", () => { galleryIndex = i; updateGallery(track, dotsContainer); });
+      });
+      document.getElementById("gallery-prev").addEventListener("click", () => {
+        galleryIndex = (galleryIndex - 1 + images.length) % images.length;
+        updateGallery(track, dotsContainer);
+      });
+      document.getElementById("gallery-next").addEventListener("click", () => {
+        galleryIndex = (galleryIndex + 1) % images.length;
+        updateGallery(track, dotsContainer);
+      });
+      updateGallery(track, dotsContainer);
     }
 
-
-    /* =====================================================
-       LOAD FLY
-       ===================================================== */
+    function escapeHtml(value) {
+      if (value === null || value === undefined) return "";
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
     async function loadFly() {
-
-      const params =
-        new URLSearchParams(
-          window.location.search
-        );
-
-      const flyId =
-        params.get("id");
-
-
-      const container =
-        document.getElementById(
-          "fly-container"
-        );
-
+      const params = new URLSearchParams(window.location.search);
+      const flyId = params.get("id");
+      const container = document.getElementById("fly-container");
 
       if (!flyId) {
-
         container.innerHTML = `
           <div class="fly-state">
             <p class="eyebrow">ERROR</p>
             <h1>Fly not found.</h1>
-            <a href="feed.html" class="text-link">
-              Return to Flies →
-            </a>
-          </div>
-        `;
-
+            <a href="feed.html" class="text-link">Return to Flies →</a>
+          </div>`;
         return;
       }
 
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient
-          .rpc(
-            "get_public_fly",
-            {
-              fly_id: flyId
-            }
-          )
-          .single();
-
+      const { data, error } = await supabaseClient.rpc("get_public_fly", { fly_id: flyId }).single();
 
       if (error || !data) {
-
-        console.error(
-          "Error loading Fly:",
-          error
-        );
-
+        console.error("Error loading Fly:", error);
         container.innerHTML = `
           <div class="fly-state">
             <p class="eyebrow">NOT FOUND</p>
             <h1>This Fly isn't available.</h1>
-            <p>
-              The Fly may have been removed or
-              is not publicly available.
-            </p>
-            <a href="feed.html" class="text-link">
-              Return to Flies →
-            </a>
-          </div>
-        `;
-
+            <p>The Fly may have been removed or is not publicly available.</p>
+            <a href="feed.html" class="text-link">Return to Flies →</a>
+          </div>`;
         return;
       }
-
-
-      /* =========================
-         IMAGES
-         ========================= */
 
       images = [];
       galleryIndex = 0;
 
-
       if (data.evidence_image_path) {
-
-        const {
-          data: publicUrlData
-        } =
-          supabaseClient.storage
-            .from("evidence")
-            .getPublicUrl(
-              data.evidence_image_path
-            );
-
-
-        if (
-          publicUrlData &&
-          publicUrlData.publicUrl
-        ) {
-
-          images.push(
-            publicUrlData.publicUrl
-          );
-
-        }
-
+        const { data: publicUrlData } = supabaseClient.storage.from("evidence").getPublicUrl(data.evidence_image_path);
+        if (publicUrlData?.publicUrl) images.push(publicUrlData.publicUrl);
       }
+      if (data.image_urls && data.image_urls.length > 0) images.push(...data.image_urls);
 
-
-      if (
-        data.image_urls &&
-        data.image_urls.length > 0
-      ) {
-
-        images.push(
-          ...data.image_urls
-        );
-
-      }
-
-
-      /* =========================
-         DATE
-         ========================= */
-
-      const formattedDate =
-        data.created_at
-          ? new Date(
-              data.created_at
-            ).toLocaleDateString(
-              undefined,
-              {
-                year: "numeric",
-                month: "long",
-                day: "numeric"
-              }
-            )
-          : "";
-
-
-      /* =========================
-         PAGE
-         ========================= */
+      const formattedDate = data.created_at
+        ? new Date(data.created_at).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })
+        : "";
 
       container.innerHTML = `
-
         <article class="fly-page">
-
           <header class="fly-header">
-
-            <p class="fly-label">
-              FLY
-            </p>
-
-            <h1 class="fly-claim">
-              ${escapeHtml(
-                data.claim || ""
-              )}
-            </h1>
-
-            ${
-              formattedDate
-                ? `
-                  <p class="fly-meta">
-                    Published ${formattedDate}
-                  </p>
-                `
-                : ""
-            }
-
+            <p class="fly-label">FLY</p>
+            <h1 class="fly-claim">${escapeHtml(data.claim || "")}</h1>
+            ${formattedDate ? `<p class="fly-meta">Published ${formattedDate}</p>` : ""}
           </header>
-
 
           ${buildGalleryHtml()}
 
-
           <div class="fly-body">
-
             <section class="fly-section fly-description">
-
-              <div class="fly-section-heading">
-                <span class="fly-section-number">
-                  01
-                </span>
-
-                <h2>
-                  Description
-                </h2>
-              </div>
-
-              <div class="fly-section-content">
-                <p>
-                  ${escapeHtml(
-                    data.description || ""
-                  )}
-                </p>
-              </div>
-
+              <div class="fly-section-heading"><span class="fly-section-number">01</span><h2>Description</h2></div>
+              <div class="fly-section-content"><p>${escapeHtml(data.description || "")}</p></div>
             </section>
-
-
             <section class="fly-section">
-
-              <div class="fly-section-heading">
-                <span class="fly-section-number">
-                  02
-                </span>
-
-                <h2>
-                  Evidence
-                </h2>
-              </div>
-
-              <div class="fly-section-content">
-                <p>
-                  ${escapeHtml(
-                    data.evidence ||
-                    "No evidence provided."
-                  )}
-                </p>
-              </div>
-
+              <div class="fly-section-heading"><span class="fly-section-number">02</span><h2>Evidence</h2></div>
+              <div class="fly-section-content"><p>${escapeHtml(data.evidence || "No evidence provided.")}</p></div>
             </section>
-
-
             <section class="fly-section">
-
-              <div class="fly-section-heading">
-                <span class="fly-section-number">
-                  03
-                </span>
-
-                <h2>
-                  Full Story
-                </h2>
-              </div>
-
-              <div class="fly-section-content">
-                <p>
-                  ${escapeHtml(
-                    data.full_story ||
-                    "No additional story provided."
-                  )}
-                </p>
-              </div>
-
+              <div class="fly-section-heading"><span class="fly-section-number">03</span><h2>Full Story</h2></div>
+              <div class="fly-section-content"><p>${escapeHtml(data.full_story || "No additional story provided.")}</p></div>
             </section>
-
-
             <section class="fly-section">
-
-              <div class="fly-section-heading">
-                <span class="fly-section-number">
-                  04
-                </span>
-
-                <h2>
-                  Conclusion
-                </h2>
-              </div>
-
-              <div class="fly-section-content">
-                <p>
-                  ${escapeHtml(
-                    data.conclusion ||
-                    "No conclusion provided."
-                  )}
-                </p>
-              </div>
-
+              <div class="fly-section-heading"><span class="fly-section-number">04</span><h2>Conclusion</h2></div>
+              <div class="fly-section-content"><p>${escapeHtml(data.conclusion || "No conclusion provided.")}</p></div>
             </section>
-
-
             <section class="fly-section fly-impact">
-
-              <div class="fly-section-heading">
-                <span class="fly-section-number">
-                  05
-                </span>
-
-                <h2>
-                  Impact
-                </h2>
-              </div>
-
-              <div class="fly-section-content">
-                <p>
-                  ${escapeHtml(
-                    data.impact ||
-                    "No impact statement provided."
-                  )}
-                </p>
-              </div>
-
+              <div class="fly-section-heading"><span class="fly-section-number">05</span><h2>Impact</h2></div>
+              <div class="fly-section-content"><p>${escapeHtml(data.impact || "No impact statement provided.")}</p></div>
             </section>
-
           </div>
 
-
           <footer class="fly-footer">
-
-            <span>
-              End of Fly
-            </span>
-
-            <a href="feed.html">
-              Explore more Flies →
-            </a>
-
+            <span>End of Fly</span>
+            <a href="feed.html">Explore more Flies →</a>
           </footer>
-
-        </article>
-
-      `;
-
+        </article>`;
 
       wireGallery();
-
     }
-
-
-    /* =====================================================
-       HTML SAFETY
-       ===================================================== */
-
-    function escapeHtml(value) {
-
-      if (
-        value === null ||
-        value === undefined
-      ) {
-        return "";
-      }
-
-
-      return String(value)
-        .replace(
-          /&/g,
-          "&amp;"
-        )
-        .replace(
-          /</g,
-          "&lt;"
-        )
-        .replace(
-          />/g,
-          "&gt;"
-        )
-        .replace(
-          /"/g,
-          "&quot;"
-        )
-        .replace(
-          /'/g,
-          "&#039;"
-        );
-
-    }
-
-
-    /* =====================================================
-       INIT
-       ===================================================== */
 
     loadFly();
-
   </script>
-
 </body>
-
 </html>

@@ -1,334 +1,122 @@
 <!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>It's Not That Deep — Explore Flies</title>
-
-    <link rel="stylesheet" href="styles.css?v=3" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>It's Not That Deep — Explore Flies</title>
+  <link rel="stylesheet" href="styles.css?v=3" />
 </head>
-
 <body>
 
-    <!-- =========================
-         NAVIGATION
-         ========================= -->
-
-    <nav class="site-nav">
-        <a href="index.html" class="site-logo">INTD</a>
-
-        <div class="site-nav-links">
-            <a href="index.html">Home</a>
-            <a href="feed.html" class="active">Feed</a>
-            <a href="profile.html">Profile</a>
-        </div>
-    </nav>
-
-
-    <!-- =========================
-         FEED HEADER
-         ========================= -->
-
-    <main class="feed-page">
-
-        <header class="feed-header">
-
-            <p class="eyebrow">PUBLIC RECORD</p>
-
-            <h1>Explore Flies</h1>
-
-            <p class="feed-intro">
-                Claims, evidence, and reasoning — documented in one place.
-                Read the case, examine the evidence, and decide for yourself.
-            </p>
-
-        </header>
-
-
-        <!-- =========================
-             FEED
-             ========================= -->
-
-        <section
-            id="feed-list"
-            class="feed-grid"
-            aria-live="polite">
-        </section>
-
-    </main>
-
-
-    <!-- =========================
-         SUPABASE
-         ========================= -->
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script>
-
-        const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
-
-        const supabaseClient = window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_ANON_KEY
-        );
-
-
-        // =========================
-        // LOAD PUBLIC FLIES
-        // =========================
-
-        async function loadFeed() {
-
-            const feedList = document.getElementById("feed-list");
-
-            // Loading state
-            feedList.innerHTML = `
-                <div class="feed-state">
-                    <p>Loading Flies...</p>
-                </div>
-            `;
-
-
-            const { data, error } =
-                await supabaseClient.rpc("get_public_flies");
-
-
-            // Error state
-            if (error) {
-
-                console.error("Error loading feed:", error);
-
-                feedList.innerHTML = `
-                    <div class="feed-state feed-error">
-                        <h2>Couldn't load the Feed</h2>
-                        <p>
-                            Something went wrong while retrieving the
-                            public Flies. Please try again.
-                        </p>
-                    </div>
-                `;
-
-                return;
-            }
-
-
-            // Empty state
-            if (!data || data.length === 0) {
-
-                feedList.innerHTML = `
-                    <div class="feed-state">
-                        <p class="eyebrow">NOTHING HERE YET</p>
-
-                        <h2>No published Flies yet.</h2>
-
-                        <p>
-                            Once a Fly is published, it will appear here
-                            as part of the public record.
-                        </p>
-
-                        <a href="index.html" class="text-link">
-                            Return home →
-                        </a>
-                    </div>
-                `;
-
-                return;
-            }
-
-
-            // =========================
-            // CREATE FLY CARDS
-            // =========================
-
-            feedList.innerHTML = "";
-
-
-            data.forEach((fly) => {
-
-                const article = document.createElement("article");
-
-                article.className = "feed-card";
-
-
-                // -------------------------
-                // IMAGE
-                // -------------------------
-
-                let thumbnailUrl = null;
-
-
-                if (fly.evidence_image_path) {
-
-                    const { data: publicUrlData } =
-                        supabaseClient.storage
-                            .from("evidence")
-                            .getPublicUrl(
-                                fly.evidence_image_path
-                            );
-
-                    thumbnailUrl = publicUrlData?.publicUrl || null;
-
-                } else if (
-                    fly.image_urls &&
-                    fly.image_urls.length > 0
-                ) {
-
-                    thumbnailUrl = fly.image_urls[0];
-
-                }
-
-
-                let imageHtml = "";
-
-
-                if (thumbnailUrl) {
-
-                    imageHtml = `
-                        <div class="feed-card-image">
-                            <img
-                                src="${thumbnailUrl}"
-                                alt="Evidence for: ${escapeHtml(fly.claim)}"
-                                loading="lazy"
-                            />
-                        </div>
-                    `;
-
-                } else {
-
-                    imageHtml = `
-                        <div class="feed-card-image feed-card-no-image">
-                            <span>NO IMAGE</span>
-                        </div>
-                    `;
-
-                }
-
-
-                // -------------------------
-                // DATE
-                // -------------------------
-
-                let formattedDate = "";
-
-
-                if (fly.created_at) {
-
-                    formattedDate =
-                        new Date(fly.created_at)
-                            .toLocaleDateString(
-                                undefined,
-                                {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric"
-                                }
-                            );
-
-                }
-
-
-                // -------------------------
-                // CARD
-                // -------------------------
-
-                article.innerHTML = `
-
-                    <a
-                        href="fly.html?id=${encodeURIComponent(fly.id)}"
-                        class="feed-card-link"
-                    >
-
-                        ${imageHtml}
-
-
-                        <div class="feed-card-content">
-
-                            <div class="feed-card-meta">
-                                <span>FLY</span>
-
-                                ${formattedDate
-                                    ? `<span>${formattedDate}</span>`
-                                    : ""
-                                }
-                            </div>
-
-
-                            <h2 class="feed-card-claim">
-                                ${escapeHtml(fly.claim)}
-                            </h2>
-
-
-                            <p class="feed-card-description">
-                                ${escapeHtml(
-                                    truncateText(
-                                        fly.description || "",
-                                        150
-                                    )
-                                )}
-                            </p>
-
-
-                            <span class="feed-card-read">
-                                Read Fly →
-                            </span>
-
-                        </div>
-
-                    </a>
-
-                `;
-
-
-                feedList.appendChild(article);
-
-            });
-
+  <nav class="site-nav">
+    <a href="index.html" class="site-logo">INTD</a>
+    <div class="site-nav-links">
+      <a href="index.html">Home</a>
+      <a href="feed.html" class="active">Feed</a>
+      <a href="profile.html">Profile</a>
+    </div>
+  </nav>
+
+  <main class="feed-page">
+    <header class="feed-header">
+      <p class="eyebrow">PUBLIC RECORD</p>
+      <h1>Explore Flies</h1>
+      <p class="feed-intro">Claims, evidence, and reasoning — documented in one place. Read the case, examine the evidence, and decide for yourself.</p>
+    </header>
+
+    <section id="feed-list" class="feed-grid" aria-live="polite"></section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function truncateText(text, maxLength) {
+      if (!text) return "";
+      if (text.length <= maxLength) return text;
+      return text.slice(0, maxLength).trim() + "...";
+    }
+
+    function escapeHtml(value) {
+      if (value === null || value === undefined) return "";
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    async function loadFeed() {
+      const feedList = document.getElementById("feed-list");
+      feedList.innerHTML = `<div class="feed-state"><p>Loading Flies...</p></div>`;
+
+      const { data, error } = await supabaseClient.rpc("get_public_flies");
+
+      if (error) {
+        console.error("Error loading feed:", error);
+        feedList.innerHTML = `
+          <div class="feed-state feed-error">
+            <h2>Couldn't load the Feed</h2>
+            <p>Something went wrong while retrieving the public Flies. Please try again.</p>
+          </div>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        feedList.innerHTML = `
+          <div class="feed-state">
+            <p class="eyebrow">NOTHING HERE YET</p>
+            <h2>No published Flies yet.</h2>
+            <p>Once a Fly is published, it will appear here as part of the public record.</p>
+            <a href="index.html" class="text-link">Return home →</a>
+          </div>`;
+        return;
+      }
+
+      feedList.innerHTML = "";
+
+      data.forEach((fly) => {
+        const article = document.createElement("article");
+        article.className = "feed-card";
+
+        let thumbnailUrl = null;
+        if (fly.evidence_image_path) {
+          const { data: publicUrlData } = supabaseClient.storage.from("evidence").getPublicUrl(fly.evidence_image_path);
+          thumbnailUrl = publicUrlData?.publicUrl || null;
+        } else if (fly.image_urls && fly.image_urls.length > 0) {
+          thumbnailUrl = fly.image_urls[0];
         }
 
+        const imageHtml = thumbnailUrl
+          ? `<div class="feed-card-image"><img src="${thumbnailUrl}" alt="Evidence for: ${escapeHtml(fly.claim)}" loading="lazy" /></div>`
+          : `<div class="feed-card-image feed-card-no-image"><span>NO IMAGE</span></div>`;
 
-        // =========================
-        // HELPERS
-        // =========================
+        const formattedDate = fly.created_at
+          ? new Date(fly.created_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
+          : "";
 
-        function truncateText(text, maxLength) {
+        article.innerHTML = `
+          <a href="fly.html?id=${encodeURIComponent(fly.id)}" class="feed-card-link">
+            ${imageHtml}
+            <div class="feed-card-content">
+              <div class="feed-card-meta">
+                <span>FLY</span>
+                ${formattedDate ? `<span>${formattedDate}</span>` : ""}
+              </div>
+              <h2 class="feed-card-claim">${escapeHtml(fly.claim)}</h2>
+              <p class="feed-card-description">${escapeHtml(truncateText(fly.description || "", 150))}</p>
+              <span class="feed-card-read">Read Fly →</span>
+            </div>
+          </a>`;
 
-            if (!text) return "";
+        feedList.appendChild(article);
+      });
+    }
 
-            if (text.length <= maxLength) {
-                return text;
-            }
-
-            return text.slice(0, maxLength).trim() + "...";
-        }
-
-
-        function escapeHtml(value) {
-
-            if (value === null || value === undefined) {
-                return "";
-            }
-
-            return String(value)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-
-        // =========================
-        // INIT
-        // =========================
-
-        loadFeed();
-
-    </script>
-
+    loadFeed();
+  </script>
 </body>
-
 </html>

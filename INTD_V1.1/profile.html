@@ -1,25 +1,26 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>It's Not That Deep — My Profile</title>
-  <link rel="stylesheet" href="styles.css?v=2" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
-
 <body>
+
   <nav class="site-nav">
-    <a href="index.html">Home</a>
-    <a href="feed.html">Feed</a>
-    <a href="profile.html">Profile</a>
+    <a href="index.html" class="site-logo">INTD</a>
+    <div class="site-nav-links">
+      <a href="index.html">Home</a>
+      <a href="feed.html">Feed</a>
+      <a href="profile.html" class="active">Profile</a>
+    </div>
   </nav>
 
   <div id="profile-header">
     <div id="avatar">
       <svg viewBox="0 0 24 24">
-        <path
-          d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
+        <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
       </svg>
     </div>
     <div id="display-name">Loading...</div>
@@ -32,20 +33,23 @@
   <script>
     const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY,
-    );
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function escapeHtml(value) {
+      if (value === null || value === undefined) return "";
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
     async function deleteFly(flyId, imagePath, listItem) {
       const confirmed = confirm("Delete this Fly? This can't be undone.");
       if (!confirmed) return;
 
-      const { error } = await supabaseClient
-        .from("flies")
-        .delete()
-        .eq("id", flyId);
-
+      const { error } = await supabaseClient.from("flies").delete().eq("id", flyId);
       if (error) {
         alert("Error deleting Fly: " + error.message);
         return;
@@ -59,10 +63,7 @@
     }
 
     async function init() {
-      const {
-        data: { session },
-      } = await supabaseClient.auth.getSession();
-
+      const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
         window.location.href = "index.html";
         return;
@@ -89,7 +90,7 @@
       fliesList.innerHTML = "";
 
       if (fliesError) {
-        fliesList.innerHTML = "<li>Error loading Flies: " + fliesError.message + "</li>";
+        fliesList.innerHTML = `<li>Error loading Flies: ${escapeHtml(fliesError.message)}</li>`;
         return;
       }
 
@@ -112,12 +113,12 @@
         }
 
         li.innerHTML = `
-    ${imageHtml}
-    <strong>${fly.claim}</strong><br>
-    ${fly.description}<br>
-    <small>${new Date(fly.created_at).toLocaleString()}</small><br>
-    <a href="edit.html?id=${fly.id}">Edit</a>
-    <button class="delete-btn" data-id="${fly.id}" data-image="${fly.evidence_image_path || ""}">Delete</button>`;
+          ${imageHtml}
+          <strong>${escapeHtml(fly.claim)}</strong><br>
+          ${escapeHtml(fly.description)}<br>
+          <small>${new Date(fly.created_at).toLocaleString()}</small><br>
+          <a href="edit.html?id=${fly.id}">Edit</a>
+          <button class="delete-btn" data-id="${fly.id}" data-image="${fly.evidence_image_path || ""}">Delete</button>`;
         fliesList.appendChild(li);
       }
 
@@ -134,5 +135,4 @@
     init();
   </script>
 </body>
-
 </html>

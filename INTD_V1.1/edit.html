@@ -1,21 +1,25 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>It's Not That Deep — Edit Fly</title>
-  <link rel="stylesheet" href="styles.css?v=2" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
-
 <body>
+
   <nav class="site-nav">
-    <a href="index.html">Home</a>
-    <a href="feed.html">Feed</a>
-    <a href="profile.html">Profile</a>
+    <a href="index.html" class="site-logo">INTD</a>
+    <div class="site-nav-links">
+      <a href="index.html">Home</a>
+      <a href="feed.html">Feed</a>
+      <a href="profile.html">Profile</a>
+    </div>
   </nav>
 
   <h1>Edit Fly</h1>
+
+  <p id="progress-status"></p>
 
   <form id="edit-form">
     <label for="claim-text">Claim</label>
@@ -37,10 +41,12 @@
       <div class="dropzone-subtext">Any image format, including iPhone photos</div>
     </div>
     <p class="dropzone-status" id="claim-image-status" style="display: none"></p>
+    <div id="claim-image-preview"></div>
     <input type="file" id="claim-image" accept="image/*,.heic,.heif" style="display: none" />
 
     <label>Additional Photos (up to 5 total)</label>
     <div id="existing-images"></div>
+    <div id="pending-images"></div>
     <div class="dropzone" id="new-images-dropzone">
       <div class="dropzone-icon">🖼️</div>
       <div class="dropzone-text">Drag photos here, or click to browse</div>
@@ -59,8 +65,9 @@
     <label for="impact-text">Impact — how this makes things better</label>
     <textarea id="impact-text" rows="3"></textarea>
 
-    <button type="submit">Save Changes</button>
+    <button type="submit" id="save-btn">Save Changes</button>
     <button type="button" id="publish-btn">Publish Fly</button>
+    <button type="button" id="unpublish-btn" style="display: none">Unpublish</button>
   </form>
 
   <p id="output"></p>
@@ -70,66 +77,36 @@
   <script>
     const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY,
-    );
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function processFileForUpload(file) {
-      const isHeic =
-        file.type === "image/heic" ||
-        file.type === "image/heif" ||
-        /\.(heic|heif)$/i.test(file.name);
-
+      const isHeic = file.type === "image/heic" || file.type === "image/heif" || /\.(heic|heif)$/i.test(file.name);
       if (!isHeic) return file;
-
-      const convertedBlob = await heic2any({
-        blob: file,
-        toType: "image/jpeg",
-        quality: 0.85,
-      });
-
+      const convertedBlob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.85 });
       const newName = file.name.replace(/\.(heic|heif)$/i, ".jpg");
       return new File([convertedBlob], newName, { type: "image/jpeg" });
     }
 
     function setupDropzone(dropzoneEl, fileInputEl, statusEl, onFilesReady) {
       dropzoneEl.addEventListener("click", () => fileInputEl.click());
-
-      dropzoneEl.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dropzoneEl.classList.add("dragover");
-      });
-
-      dropzoneEl.addEventListener("dragleave", () => {
-        dropzoneEl.classList.remove("dragover");
-      });
-
+      dropzoneEl.addEventListener("dragover", (e) => { e.preventDefault(); dropzoneEl.classList.add("dragover"); });
+      dropzoneEl.addEventListener("dragleave", () => dropzoneEl.classList.remove("dragover"));
       dropzoneEl.addEventListener("drop", async (e) => {
         e.preventDefault();
         dropzoneEl.classList.remove("dragover");
-        const files = Array.from(e.dataTransfer.files).filter((f) =>
-          f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name)
-        );
-        if (files.length === 0) return;
-        await handleFiles(files);
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name));
+        if (files.length) await handleFiles(files);
       });
-
       fileInputEl.addEventListener("change", async () => {
         const files = Array.from(fileInputEl.files);
-        if (files.length === 0) return;
-        await handleFiles(files);
+        if (files.length) await handleFiles(files);
       });
-
       async function handleFiles(files) {
         statusEl.textContent = "Processing image" + (files.length > 1 ? "s" : "") + "...";
         statusEl.style.display = "block";
-
         try {
           const processed = [];
-          for (const file of files) {
-            processed.push(await processFileForUpload(file));
-          }
+          for (const file of files) processed.push(await processFileForUpload(file));
           statusEl.style.display = "none";
           onFilesReady(processed);
         } catch (err) {
@@ -151,11 +128,34 @@
     const impactText = document.getElementById("impact-text");
     const output = document.getElementById("output");
     const existingImagesDiv = document.getElementById("existing-images");
-    const newImagesInput = document.getElementById("new-images");
+    const pendingImagesDiv = document.getElementById("pending-images");
+    const claimImagePreview = document.getElementById("claim-image-preview");
     const imageLimitError = document.getElementById("image-limit-error");
+    const progressStatus = document.getElementById("progress-status");
+    const saveBtn = document.getElementById("save-btn");
+    const publishBtn = document.getElementById("publish-btn");
+    const unpublishBtn = document.getElementById("unpublish-btn");
 
     let pendingClaimImage = null;
     let pendingNewImages = [];
+    let currentImagePath = null;
+    let currentUserId = null;
+    let currentImageUrls = [];
+    let currentPublished = false;
+    let isDirty = false;
+
+    const allFields = [claimText, descriptionText, evidenceText, fullStoryText, conclusionText, impactText];
+    allFields.forEach(el => el.addEventListener("input", () => { isDirty = true; updateProgress(); }));
+
+    function updateProgress() {
+      const filledCount = allFields.filter(el => el.value.trim().length > 0).length;
+      progressStatus.textContent = `${filledCount}/6 sections complete`;
+      publishBtn.disabled = filledCount < 6 && !currentPublished;
+    }
+
+    window.addEventListener("beforeunload", (e) => {
+      if (isDirty) { e.preventDefault(); e.returnValue = ""; }
+    });
 
     setupDropzone(
       document.getElementById("claim-image-dropzone"),
@@ -163,6 +163,10 @@
       document.getElementById("claim-image-status"),
       (files) => {
         pendingClaimImage = files[0];
+        isDirty = true;
+        claimImagePreview.innerHTML = pendingClaimImage
+          ? `<img src="${URL.createObjectURL(pendingClaimImage)}" class="fly-thumbnail" alt="New photo preview" />`
+          : "";
       }
     );
 
@@ -172,88 +176,75 @@
       document.getElementById("new-images-status"),
       (files) => {
         imageLimitError.style.display = "none";
-        const allowed = 5 - currentImageUrls.length;
-
+        const allowed = 5 - currentImageUrls.length - pendingNewImages.length;
         if (files.length > allowed) {
-          imageLimitError.textContent = `You can add up to ${allowed} more photo(s) — you already have ${currentImageUrls.length}/5.`;
+          imageLimitError.textContent = `You can add up to ${allowed} more photo(s) — you already have ${currentImageUrls.length + pendingNewImages.length}/5.`;
           imageLimitError.style.display = "block";
-          pendingNewImages = [];
           return;
         }
-
-        pendingNewImages = files;
+        pendingNewImages = pendingNewImages.concat(files);
+        isDirty = true;
+        renderPendingImages();
       }
     );
-
-    let currentImagePath = null;
-    let currentUserId = null;
-    let currentImageUrls = [];
 
     function renderExistingImages() {
       existingImagesDiv.innerHTML = "";
       currentImageUrls.forEach((url, index) => {
         const wrapper = document.createElement("div");
         wrapper.className = "image-thumb-wrapper";
-        wrapper.innerHTML = `
-          <img src="${url}" alt="Fly image" />
-          <button type="button" class="remove-image-btn" data-index="${index}">×</button>
-        `;
+        wrapper.innerHTML = `<img src="${url}" alt="Fly image" /><button type="button" class="remove-image-btn" data-index="${index}">×</button>`;
         existingImagesDiv.appendChild(wrapper);
       });
     }
+
+    function renderPendingImages() {
+      pendingImagesDiv.innerHTML = "";
+      pendingNewImages.forEach((file, index) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "image-thumb-wrapper";
+        wrapper.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Pending image" /><button type="button" class="remove-pending-btn" data-index="${index}">×</button>`;
+        pendingImagesDiv.appendChild(wrapper);
+      });
+    }
+
+    pendingImagesDiv.addEventListener("click", (e) => {
+      if (e.target.classList.contains("remove-pending-btn")) {
+        const index = parseInt(e.target.dataset.index, 10);
+        pendingNewImages.splice(index, 1);
+        renderPendingImages();
+      }
+    });
 
     existingImagesDiv.addEventListener("click", async (e) => {
       if (e.target.classList.contains("remove-image-btn")) {
         const index = parseInt(e.target.dataset.index, 10);
         const urlToRemove = currentImageUrls[index];
         const path = urlToRemove.split("/fly-images/")[1];
-
-        if (path) {
-          await supabaseClient.storage.from("fly-images").remove([path]);
-        }
-
+        if (path) await supabaseClient.storage.from("fly-images").remove([path]);
         currentImageUrls.splice(index, 1);
-
-        const { error } = await supabaseClient
-          .from("flies")
-          .update({ image_urls: currentImageUrls })
-          .eq("id", flyId);
-
-        if (error) {
-          output.textContent = "Error removing image: " + error.message;
-        }
-
+        const { error } = await supabaseClient.from("flies").update({ image_urls: currentImageUrls }).eq("id", flyId);
+        if (error) output.textContent = "Error removing image: " + error.message;
         renderExistingImages();
       }
     });
 
     async function loadFly() {
-      const {
-        data: { session },
-      } = await supabaseClient.auth.getSession();
-
-      if (!session) {
-        window.location.href = "index.html";
-        return;
-      }
-
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) { window.location.href = "index.html"; return; }
       currentUserId = session.user.id;
 
-      if (!flyId) {
-        output.textContent = "No Fly ID provided.";
-        return;
-      }
+      if (!flyId) { output.textContent = "No Fly ID provided."; return; }
+
+      output.textContent = "Loading Fly...";
 
       const { data, error } = await supabaseClient
         .from("flies")
-        .select("claim, description, evidence, full_story, conclusion, impact, evidence_image_path, image_urls")
+        .select("claim, description, evidence, full_story, conclusion, impact, evidence_image_path, image_urls, published")
         .eq("id", flyId)
         .single();
 
-      if (error) {
-        output.textContent = "Error loading Fly: " + error.message;
-        return;
-      }
+      if (error) { output.textContent = "Error loading Fly: " + error.message; return; }
 
       claimText.value = data.claim;
       descriptionText.value = data.description;
@@ -261,47 +252,61 @@
       fullStoryText.value = data.full_story || "";
       conclusionText.value = data.conclusion || "";
       impactText.value = data.impact || "";
-
       currentImagePath = data.evidence_image_path || null;
       currentImageUrls = data.image_urls || [];
+      currentPublished = data.published || false;
+
       renderExistingImages();
+      updateProgress();
+      unpublishBtn.style.display = currentPublished ? "inline-block" : "none";
+      publishBtn.style.display = currentPublished ? "none" : "inline-block";
 
       if (currentImagePath) {
-        const { data: signedData } = await supabaseClient.storage
-          .from("evidence")
-          .createSignedUrl(currentImagePath, 3600);
-        if (signedData) {
-          document.getElementById("current-image").innerHTML =
-            `<img src="${signedData.signedUrl}" class="fly-thumbnail" alt="Evidence photo" />`;
-        }
+        const { data: signedData } = await supabaseClient.storage.from("evidence").createSignedUrl(currentImagePath, 3600);
+        if (signedData) document.getElementById("current-image").innerHTML = `<img src="${signedData.signedUrl}" class="fly-thumbnail" alt="Evidence photo" />`;
       } else {
         document.getElementById("current-image").textContent = "No photo attached.";
       }
+
+      output.textContent = "";
+      isDirty = false;
     }
 
-    document.getElementById("publish-btn").addEventListener("click", async () => {
-      const allFilled =
-        claimText.value.trim() &&
-        descriptionText.value.trim() &&
-        evidenceText.value.trim() &&
-        fullStoryText.value.trim() &&
-        conclusionText.value.trim() &&
-        impactText.value.trim();
+    publishBtn.addEventListener("click", async () => {
+      const filledCount = allFields.filter(el => el.value.trim().length > 0).length;
+      if (filledCount < 6) { output.textContent = "Fill in all six sections before publishing."; return; }
 
-      if (!allFilled) {
-        output.textContent = "Fill in all five sections before publishing.";
-        return;
-      }
-
-      const { error } = await supabaseClient
-        .from("flies")
-        .update({ published: true })
-        .eq("id", flyId);
+      publishBtn.disabled = true;
+      publishBtn.textContent = "Publishing...";
+      const { error } = await supabaseClient.from("flies").update({ published: true }).eq("id", flyId);
+      publishBtn.textContent = "Publish Fly";
 
       if (error) {
         output.textContent = "Error publishing: " + error.message;
+        publishBtn.disabled = false;
       } else {
         output.textContent = "Published! This Fly is now visible on the public Feed.";
+        currentPublished = true;
+        unpublishBtn.style.display = "inline-block";
+        publishBtn.style.display = "none";
+      }
+    });
+
+    unpublishBtn.addEventListener("click", async () => {
+      unpublishBtn.disabled = true;
+      unpublishBtn.textContent = "Unpublishing...";
+      const { error } = await supabaseClient.from("flies").update({ published: false }).eq("id", flyId);
+      unpublishBtn.disabled = false;
+      unpublishBtn.textContent = "Unpublish";
+
+      if (error) {
+        output.textContent = "Error unpublishing: " + error.message;
+      } else {
+        output.textContent = "Unpublished. This Fly is no longer visible on the public Feed.";
+        currentPublished = false;
+        unpublishBtn.style.display = "none";
+        publishBtn.style.display = "inline-block";
+        updateProgress();
       }
     });
 
@@ -311,50 +316,40 @@
 
       const newFiles = pendingNewImages;
       const totalCount = currentImageUrls.length + newFiles.length;
-
       if (totalCount > 5) {
-        imageLimitError.textContent = `You have ${currentImageUrls.length} existing photo(s) and selected ${newFiles.length} new one(s) — that's ${totalCount} total. Max is 5. Remove some before saving.`;
+        imageLimitError.textContent = `That's ${totalCount} total photos. Max is 5. Remove some before saving.`;
         imageLimitError.style.display = "block";
         return;
       }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving...";
 
       const newImageFile = pendingClaimImage;
       let imagePath = currentImagePath;
 
       if (newImageFile) {
         const filePath = `${currentUserId}/${Date.now()}-${newImageFile.name}`;
-        const { error: uploadError } = await supabaseClient.storage
-          .from("evidence")
-          .upload(filePath, newImageFile);
-
+        const { error: uploadError } = await supabaseClient.storage.from("evidence").upload(filePath, newImageFile);
         if (uploadError) {
           output.textContent = "Image upload failed: " + uploadError.message;
+          saveBtn.disabled = false; saveBtn.textContent = "Save Changes";
           return;
         }
-
-        if (currentImagePath) {
-          await supabaseClient.storage.from("evidence").remove([currentImagePath]);
-        }
-
+        if (currentImagePath) await supabaseClient.storage.from("evidence").remove([currentImagePath]);
         imagePath = filePath;
       }
 
       const uploadedUrls = [];
       for (const file of newFiles) {
         const filePath = `${currentUserId}/${Date.now()}-${file.name}`;
-        const { error: uploadError } = await supabaseClient.storage
-          .from("fly-images")
-          .upload(filePath, file);
-
+        const { error: uploadError } = await supabaseClient.storage.from("fly-images").upload(filePath, file);
         if (uploadError) {
           output.textContent = "Image upload failed: " + uploadError.message;
+          saveBtn.disabled = false; saveBtn.textContent = "Save Changes";
           return;
         }
-
-        const { data: publicUrlData } = supabaseClient.storage
-          .from("fly-images")
-          .getPublicUrl(filePath);
-
+        const { data: publicUrlData } = supabaseClient.storage.from("fly-images").getPublicUrl(filePath);
         uploadedUrls.push(publicUrlData.publicUrl);
       }
 
@@ -374,18 +369,25 @@
         })
         .eq("id", flyId);
 
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save Changes";
+
       if (error) {
         output.textContent = "Error saving: " + error.message;
       } else {
         output.textContent = "Saved!";
+        currentImagePath = imagePath;
         currentImageUrls = finalImageUrls;
         pendingNewImages = [];
+        pendingClaimImage = null;
+        claimImagePreview.innerHTML = "";
+        isDirty = false;
         renderExistingImages();
+        renderPendingImages();
       }
     });
 
     loadFly();
   </script>
 </body>
-
 </html>
