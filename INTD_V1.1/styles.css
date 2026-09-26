@@ -854,3 +854,43 @@ li small {
     right: 8px;
   }
 }
+
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: border-color 150ms ease, background-color 150ms ease;
+  background-color: var(--surface);
+}
+
+.dropzone:hover,
+.dropzone.dragover {
+  border-color: var(--accent);
+  background-color: var(--surface-2);
+}
+
+.dropzone-icon {
+  font-size: 1.6rem;
+  margin-bottom: 6px;
+  color: var(--mint);
+}
+
+.dropzone-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.dropzone-subtext {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.dropzone-status {
+  font-size: 0.8rem;
+  color: var(--accent);
+  margin-bottom: 12px;
+}

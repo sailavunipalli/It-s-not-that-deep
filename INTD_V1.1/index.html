@@ -92,8 +92,14 @@
       <label for="claim-evidence">Evidence (optional for now — links, sources, notes)</label>
       <textarea id="claim-evidence" name="evidence" rows="3"
         placeholder="Paste links, sources, or describe your evidence..."></textarea>
-      <label for="claim-image">Evidence Photo (optional)</label>
-      <input type="file" id="claim-image" accept="image/*" />
+      <label>Evidence Photo (optional)</label>
+      <div class="dropzone" id="claim-image-dropzone">
+        <div class="dropzone-icon">📎</div>
+        <div class="dropzone-text">Drag a photo here, or click to browse</div>
+        <div class="dropzone-subtext">Any image format, including iPhone photos</div>
+      </div>
+      <p class="dropzone-status" id="claim-image-status" style="display: none"></p>
+      <input type="file" id="claim-image" accept="image/*,.heic,.heif" style="display: none" />
 
       <label for="claim-full-story">Full Story (optional for now)</label>
       <textarea id="claim-full-story" name="full_story" rows="5"
@@ -118,6 +124,7 @@
 
   <p id="output"></p>
 
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -127,6 +134,70 @@
       SUPABASE_URL,
       SUPABASE_ANON_KEY,
     );
+
+    async function processFileForUpload(file) {
+      const isHeic =
+        file.type === "image/heic" ||
+        file.type === "image/heif" ||
+        /\.(heic|heif)$/i.test(file.name);
+
+      if (!isHeic) return file;
+
+      const convertedBlob = await heic2any({
+        blob: file,
+        toType: "image/jpeg",
+        quality: 0.85,
+      });
+
+      const newName = file.name.replace(/\.(heic|heif)$/i, ".jpg");
+      return new File([convertedBlob], newName, { type: "image/jpeg" });
+    }
+
+    function setupDropzone(dropzoneEl, fileInputEl, statusEl, onFilesReady) {
+      dropzoneEl.addEventListener("click", () => fileInputEl.click());
+
+      dropzoneEl.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzoneEl.classList.add("dragover");
+      });
+
+      dropzoneEl.addEventListener("dragleave", () => {
+        dropzoneEl.classList.remove("dragover");
+      });
+
+      dropzoneEl.addEventListener("drop", async (e) => {
+        e.preventDefault();
+        dropzoneEl.classList.remove("dragover");
+        const files = Array.from(e.dataTransfer.files).filter((f) =>
+          f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name)
+        );
+        if (files.length === 0) return;
+        await handleFiles(files);
+      });
+
+      fileInputEl.addEventListener("change", async () => {
+        const files = Array.from(fileInputEl.files);
+        if (files.length === 0) return;
+        await handleFiles(files);
+      });
+
+      async function handleFiles(files) {
+        statusEl.textContent = "Processing image" + (files.length > 1 ? "s" : "") + "...";
+        statusEl.style.display = "block";
+
+        try {
+          const processed = [];
+          for (const file of files) {
+            processed.push(await processFileForUpload(file));
+          }
+          statusEl.style.display = "none";
+          onFilesReady(processed);
+        } catch (err) {
+          statusEl.textContent = "Couldn't process one of the images. Try a different file.";
+          console.error("Image processing error:", err);
+        }
+      }
+    }
 
     const authForm = document.getElementById("auth-form");
     const loginView = document.getElementById("login-view");
@@ -145,6 +216,17 @@
     const claimSection = document.getElementById("claim-section");
     const form = document.getElementById("claim-form");
     const output = document.getElementById("output");
+
+    let pendingClaimImage = null;
+
+    setupDropzone(
+      document.getElementById("claim-image-dropzone"),
+      document.getElementById("claim-image"),
+      document.getElementById("claim-image-status"),
+      (files) => {
+        pendingClaimImage = files[0];
+      }
+    );
 
     document.getElementById("show-signup").addEventListener("click", (e) => {
       e.preventDefault();
@@ -318,7 +400,7 @@
       const fullStoryText = document.getElementById("claim-full-story").value;
       const conclusionText = document.getElementById("claim-conclusion").value;
       const impactText = document.getElementById("claim-impact").value;
-      const imageFile = document.getElementById("claim-image").files[0];
+      const imageFile = pendingClaimImage;
 
       const {
         data: { user },
@@ -363,6 +445,7 @@
         console.log("Saved Fly:", data);
         output.textContent = "Fly saved! ID: " + data[0].id;
         form.reset();
+        pendingClaimImage = null;
         loadMyFlies();
       }
     });

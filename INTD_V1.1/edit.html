@@ -30,12 +30,24 @@
     <label>Current Evidence Photo</label>
     <div id="current-image"></div>
 
-    <label for="claim-image">Replace Evidence Photo (optional)</label>
-    <input type="file" id="claim-image" accept="image/*" />
+    <label>Replace Evidence Photo (optional)</label>
+    <div class="dropzone" id="claim-image-dropzone">
+      <div class="dropzone-icon">📎</div>
+      <div class="dropzone-text">Drag a photo here, or click to browse</div>
+      <div class="dropzone-subtext">Any image format, including iPhone photos</div>
+    </div>
+    <p class="dropzone-status" id="claim-image-status" style="display: none"></p>
+    <input type="file" id="claim-image" accept="image/*,.heic,.heif" style="display: none" />
 
     <label>Additional Photos (up to 5 total)</label>
     <div id="existing-images"></div>
-    <input type="file" id="new-images" accept="image/*" multiple />
+    <div class="dropzone" id="new-images-dropzone">
+      <div class="dropzone-icon">🖼️</div>
+      <div class="dropzone-text">Drag photos here, or click to browse</div>
+      <div class="dropzone-subtext">Any image format, including iPhone photos</div>
+    </div>
+    <p class="dropzone-status" id="new-images-status" style="display: none"></p>
+    <input type="file" id="new-images" accept="image/*,.heic,.heif" multiple style="display: none" />
     <p id="image-limit-error" class="error-text" style="display: none"></p>
 
     <label for="full-story-text">Full Story</label>
@@ -53,6 +65,7 @@
 
   <p id="output"></p>
 
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
@@ -61,6 +74,70 @@
       SUPABASE_URL,
       SUPABASE_ANON_KEY,
     );
+
+    async function processFileForUpload(file) {
+      const isHeic =
+        file.type === "image/heic" ||
+        file.type === "image/heif" ||
+        /\.(heic|heif)$/i.test(file.name);
+
+      if (!isHeic) return file;
+
+      const convertedBlob = await heic2any({
+        blob: file,
+        toType: "image/jpeg",
+        quality: 0.85,
+      });
+
+      const newName = file.name.replace(/\.(heic|heif)$/i, ".jpg");
+      return new File([convertedBlob], newName, { type: "image/jpeg" });
+    }
+
+    function setupDropzone(dropzoneEl, fileInputEl, statusEl, onFilesReady) {
+      dropzoneEl.addEventListener("click", () => fileInputEl.click());
+
+      dropzoneEl.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzoneEl.classList.add("dragover");
+      });
+
+      dropzoneEl.addEventListener("dragleave", () => {
+        dropzoneEl.classList.remove("dragover");
+      });
+
+      dropzoneEl.addEventListener("drop", async (e) => {
+        e.preventDefault();
+        dropzoneEl.classList.remove("dragover");
+        const files = Array.from(e.dataTransfer.files).filter((f) =>
+          f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name)
+        );
+        if (files.length === 0) return;
+        await handleFiles(files);
+      });
+
+      fileInputEl.addEventListener("change", async () => {
+        const files = Array.from(fileInputEl.files);
+        if (files.length === 0) return;
+        await handleFiles(files);
+      });
+
+      async function handleFiles(files) {
+        statusEl.textContent = "Processing image" + (files.length > 1 ? "s" : "") + "...";
+        statusEl.style.display = "block";
+
+        try {
+          const processed = [];
+          for (const file of files) {
+            processed.push(await processFileForUpload(file));
+          }
+          statusEl.style.display = "none";
+          onFilesReady(processed);
+        } catch (err) {
+          statusEl.textContent = "Couldn't process one of the images. Try a different file.";
+          console.error("Image processing error:", err);
+        }
+      }
+    }
 
     const params = new URLSearchParams(window.location.search);
     const flyId = params.get("id");
@@ -76,6 +153,37 @@
     const existingImagesDiv = document.getElementById("existing-images");
     const newImagesInput = document.getElementById("new-images");
     const imageLimitError = document.getElementById("image-limit-error");
+
+    let pendingClaimImage = null;
+    let pendingNewImages = [];
+
+    setupDropzone(
+      document.getElementById("claim-image-dropzone"),
+      document.getElementById("claim-image"),
+      document.getElementById("claim-image-status"),
+      (files) => {
+        pendingClaimImage = files[0];
+      }
+    );
+
+    setupDropzone(
+      document.getElementById("new-images-dropzone"),
+      document.getElementById("new-images"),
+      document.getElementById("new-images-status"),
+      (files) => {
+        imageLimitError.style.display = "none";
+        const allowed = 5 - currentImageUrls.length;
+
+        if (files.length > allowed) {
+          imageLimitError.textContent = `You can add up to ${allowed} more photo(s) — you already have ${currentImageUrls.length}/5.`;
+          imageLimitError.style.display = "block";
+          pendingNewImages = [];
+          return;
+        }
+
+        pendingNewImages = files;
+      }
+    );
 
     let currentImagePath = null;
     let currentUserId = null;
@@ -93,18 +201,6 @@
         existingImagesDiv.appendChild(wrapper);
       });
     }
-
-    newImagesInput.addEventListener("change", () => {
-      imageLimitError.style.display = "none";
-      const selected = Array.from(newImagesInput.files);
-      const allowed = 5 - currentImageUrls.length;
-
-      if (selected.length > allowed) {
-        imageLimitError.textContent = `You can add up to ${allowed} more photo(s) — you already have ${currentImageUrls.length}/5. Reselect fewer files.`;
-        imageLimitError.style.display = "block";
-        newImagesInput.value = "";
-      }
-    });
 
     existingImagesDiv.addEventListener("click", async (e) => {
       if (e.target.classList.contains("remove-image-btn")) {
@@ -213,7 +309,7 @@
       e.preventDefault();
       imageLimitError.style.display = "none";
 
-      const newFiles = Array.from(newImagesInput.files);
+      const newFiles = pendingNewImages;
       const totalCount = currentImageUrls.length + newFiles.length;
 
       if (totalCount > 5) {
@@ -222,7 +318,7 @@
         return;
       }
 
-      const newImageFile = document.getElementById("claim-image").files[0];
+      const newImageFile = pendingClaimImage;
       let imagePath = currentImagePath;
 
       if (newImageFile) {
@@ -283,7 +379,7 @@
       } else {
         output.textContent = "Saved!";
         currentImageUrls = finalImageUrls;
-        newImagesInput.value = "";
+        pendingNewImages = [];
         renderExistingImages();
       }
     });
