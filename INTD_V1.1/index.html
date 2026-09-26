@@ -19,6 +19,19 @@
 
   <main>
 
+    <!-- MAIN FEED (Moved to Top) -->
+    <section id="recent-flies-section" class="recent-flies-section">
+      <div class="section-heading section-heading-row">
+        <div>
+          <p class="section-label">FEED</p>
+          <h2>Recent Flies</h2>
+        </div>
+        <a href="feed.html" class="section-link">View all →</a>
+      </div>
+      <div id="recent-flies-list" class="recent-flies-grid"></div>
+    </section>
+
+    <!-- HERO SECTION -->
     <section class="hero-section">
       <p class="hero-eyebrow">IT'S NOT THAT DEEP</p>
       <h1>Claims are easy.<br />Evidence takes work.</h1>
@@ -51,17 +64,6 @@
           <p>Explain the story, conclusion, and why the claim matters.</p>
         </article>
       </div>
-    </section>
-
-    <section id="recent-flies-section" class="recent-flies-section">
-      <div class="section-heading section-heading-row">
-        <div>
-          <p class="section-label">RECENT FLIES</p>
-          <h2>See what people are documenting.</h2>
-        </div>
-        <a href="feed.html" class="section-link">View all →</a>
-      </div>
-      <div id="recent-flies-list" class="recent-flies-grid"></div>
     </section>
 
     <section class="fly-structure-section">
@@ -327,7 +329,7 @@
     setupPasswordToggle("toggle-signup-confirm-password", signupConfirmPassword);
 
     async function loadRecentFlies() {
-      const { data, error } = await supabaseClient.rpc("get_recent_flies", { limit_count: 5 });
+      const { data, error } = await supabaseClient.rpc("get_recent_flies", { limit_count: 10 });
       const list = document.getElementById("recent-flies-list");
       list.innerHTML = "";
       if (error) {
