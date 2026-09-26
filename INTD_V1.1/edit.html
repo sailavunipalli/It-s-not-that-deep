@@ -94,10 +94,39 @@
       });
     }
 
-    existingImagesDiv.addEventListener("click", (e) => {
+    newImagesInput.addEventListener("change", () => {
+      imageLimitError.style.display = "none";
+      const selected = Array.from(newImagesInput.files);
+      const allowed = 5 - currentImageUrls.length;
+
+      if (selected.length > allowed) {
+        imageLimitError.textContent = `You can add up to ${allowed} more photo(s) — you already have ${currentImageUrls.length}/5. Reselect fewer files.`;
+        imageLimitError.style.display = "block";
+        newImagesInput.value = "";
+      }
+    });
+
+    existingImagesDiv.addEventListener("click", async (e) => {
       if (e.target.classList.contains("remove-image-btn")) {
         const index = parseInt(e.target.dataset.index, 10);
+        const urlToRemove = currentImageUrls[index];
+        const path = urlToRemove.split("/fly-images/")[1];
+
+        if (path) {
+          await supabaseClient.storage.from("fly-images").remove([path]);
+        }
+
         currentImageUrls.splice(index, 1);
+
+        const { error } = await supabaseClient
+          .from("flies")
+          .update({ image_urls: currentImageUrls })
+          .eq("id", flyId);
+
+        if (error) {
+          output.textContent = "Error removing image: " + error.message;
+        }
+
         renderExistingImages();
       }
     });
