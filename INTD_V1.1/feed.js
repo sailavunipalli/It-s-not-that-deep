@@ -6,6 +6,7 @@
 // =========================================================
 
 const FEED_PAGE_SIZE = 6;
+const TICKER_INTERVAL_MS = 2600;
 
 function buildFlyCard(fly) {
   const card = document.createElement("article");
@@ -103,4 +104,100 @@ async function renderPublicFeed() {
   }
 }
 
+// =========================================================
+//   Recent Flies ticker
+//
+//   Publishing is a label, not a gate. Every visitor sees the newest
+//   claims whether or not their author published them: green means
+//   published, orange means still a draft. The dot is the disclosure.
+// =========================================================
+
+let tickerItems = [];
+let tickerIndex = 0;
+let tickerTimer = null;
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+async function loadTickerItems() {
+  const { data, error } = await supabaseClient.rpc("get_ticker_flies");
+
+  if (error) {
+    console.error("Ticker unavailable:", error);
+    return [];
+  }
+
+  return (data || []).map((fly) => ({
+    id: fly.id,
+    claim: fly.claim,
+    state: fly.published ? "published" : "draft",
+  }));
+}
+
+function paintTicker() {
+  const link = document.getElementById("ticker-link");
+  const claim = document.getElementById("ticker-claim");
+  const dot = document.getElementById("ticker-dot");
+  const item = tickerItems[tickerIndex];
+  if (!item) return;
+
+  link.href = "fly.html?id=" + encodeURIComponent(item.id);
+
+  claim.textContent = item.claim;
+  dot.dataset.state = item.state;
+  link.setAttribute(
+    "aria-label",
+    (item.state === "published" ? "Published Fly: " : "Unpublished Fly: ") + item.claim
+  );
+}
+
+function stepTicker() {
+  tickerIndex = (tickerIndex + 1) % tickerItems.length;
+  const window_ = document.getElementById("ticker-window");
+  window_.classList.add("is-swapping");
+  setTimeout(() => {
+    paintTicker();
+    window_.classList.remove("is-swapping");
+  }, 180);
+}
+
+function setTickerPaused(paused) {
+  if (tickerTimer) {
+    clearInterval(tickerTimer);
+    tickerTimer = null;
+  }
+  if (!paused && !reduceMotion.matches && tickerItems.length > 1) {
+    tickerTimer = setInterval(stepTicker, TICKER_INTERVAL_MS);
+  }
+}
+
+function initTicker() {
+  const section = document.getElementById("ticker");
+  if (!section) return;
+
+  loadTickerItems().then((items) => {
+    if (items.length === 0) {
+      section.hidden = true;
+      return;
+    }
+
+    tickerItems = items;
+    paintTicker();
+
+    // Both keys always show. Anyone can see an orange claim now, so the
+    // legend cannot imply drafts are hidden.
+    const hasDrafts = items.some((item) => item.state === "draft");
+    document.getElementById("ticker-legend-draft").hidden = !hasDrafts;
+
+    const window_ = document.getElementById("ticker-window");
+    window_.addEventListener("mouseenter", () => setTickerPaused(true));
+    window_.addEventListener("mouseleave", () => setTickerPaused(false));
+    window_.addEventListener("focusin", () => setTickerPaused(true));
+    window_.addEventListener("focusout", () => setTickerPaused(false));
+    document.addEventListener("visibilitychange", () => setTickerPaused(document.hidden));
+
+    setTickerPaused(false);
+  });
+}
+
 document.addEventListener("DOMContentLoaded", renderPublicFeed);
+document.addEventListener("DOMContentLoaded", initTicker);

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTD — It's Not That Deep</title>
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
 
@@ -79,6 +79,27 @@
         <a href="profile.html" class="secondary-btn">My Flies</a>
         <button type="button" id="logout-btn" class="secondary-btn">Log out</button>
       </div>
+    </section>
+
+    <!-- Recent Flies ticker -->
+    <section id="ticker" class="ticker" aria-labelledby="ticker-heading" hidden>
+      <h2 id="ticker-heading" class="ticker-heading">Recent Flies</h2>
+
+      <div class="ticker-window" id="ticker-window">
+        <a id="ticker-link" class="ticker-item" href="feed.html">
+          <span class="ticker-dot" id="ticker-dot" data-state="published" aria-hidden="true"></span>
+          <span class="ticker-claim" id="ticker-claim"></span>
+        </a>
+      </div>
+
+      <p class="ticker-legend">
+        <span class="ticker-legend-item">
+          <span class="ticker-dot" data-state="published" aria-hidden="true"></span>Published
+        </span>
+        <span class="ticker-legend-item" id="ticker-legend-draft" hidden>
+          <span class="ticker-dot" data-state="draft" aria-hidden="true"></span>Unpublished, still visible to everyone
+        </span>
+      </p>
     </section>
 
     <!-- Dynamic Feed Container -->
