@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>It's Not That Deep — My Profile</title>
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body>
 
@@ -27,29 +27,17 @@
       <div id="display-name" class="profile-name">Loading user profile...</div>
     </div>
 
-    <header class="feed-header">
+    <header class="feed-header profile-list-header">
       <h2>My Flies</h2>
+      <a href="edit.html" class="primary-btn">New Fly</a>
     </header>
 
     <section id="flies-list" class="recent-flies-grid"></section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
   <script>
-    const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    function escapeHtml(value) {
-      if (value === null || value === undefined) return "";
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
     async function deleteFly(flyId, imagePath, cardElement) {
       const confirmed = confirm("Delete this Fly? This action cannot be undone.");
       if (!confirmed) return;
@@ -61,7 +49,7 @@
       }
 
       if (imagePath) {
-        await supabaseClient.storage.from("evidence").remove([imagePath]);
+        await supabaseClient.storage.from(EVIDENCE_BUCKET).remove([imagePath]);
       }
 
       cardElement.remove();
@@ -89,6 +77,7 @@
       const { data: flies, error: fliesError } = await supabaseClient
         .from("flies")
         .select("id, claim, description, created_at, evidence_image_path")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       const fliesList = document.getElementById("flies-list");
@@ -111,7 +100,7 @@
         let imageHtml = "";
         if (fly.evidence_image_path) {
           const { data: signedData } = await supabaseClient.storage
-            .from("evidence")
+            .from(EVIDENCE_BUCKET)
             .createSignedUrl(fly.evidence_image_path, 3600);
           if (signedData) {
             imageHtml = `<div class="feed-card-image"><img src="${signedData.signedUrl}" alt="Evidence thumbnail" /></div>`;

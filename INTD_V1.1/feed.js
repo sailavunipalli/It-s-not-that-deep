@@ -1,106 +1,106 @@
-// Sample dataset of flies for the home feed
-const allFlies = [
-  {
-    id: "1",
-    author: "FLY",
-    date: "Posted 27 Sept 2026",
-    claim: "Seasonal agricultural stubble burning in neighboring states is the primary cause of acute winter 'Severe+' AQI spikes in Delhi.",
-    description: "Every November, air pollution in Delhi reaches hazardous levels. While urban transportation and industrial dust maintain a high baseline, satellite tracking proves agricultural fires drive seasonal surges.",
-    image: "public/images/delhi-aqi.jpg",
-    link: "fly.html?id=1"
-  },
-  {
-    id: "2",
-    author: "FLY",
-    date: "Posted 27 Sept 2026",
-    claim: "Citizens for Justice and Peace (CJP) public interest litigation highlights the necessity for strict, verified affidavit standards.",
-    description: "CJP engaged in multi-year legal battles following the 2002 Gujarat riots, demonstrating the boundary between legal advocacy and formal rules of evidence.",
-    image: "public/images/cjp.jpg",
-    link: "fly.html?id=2"
-  },
-  {
-    id: "3",
-    author: "FLY",
-    date: "Posted 27 Sept 2026",
-    claim: "The 2008 Non-Prosecution Agreement granted to Jeffrey Epstein illegally bypassed victim rights guaranteed by federal statute.",
-    description: "Federal scrutiny over the handling of confidential plea deals brought nationwide attention to prosecutorial transparency.",
-    image: null,
-    link: "fly.html?id=3"
-  },
-  {
-    id: "4",
-    author: "FLY",
-    date: "Posted 27 Sept 2026",
-    claim: "The August 2024 assault and murder of a trainee doctor at RG Kar Medical College exposed systemic institutional failures.",
-    description: "Following the crime, nationwide medical strikes erupted across India, prompting the Supreme Court to mandate structural safety standards.",
-    image: "public/images/rgkar.jpg",
-    link: "fly.html?id=4"
-  },
-  {
-    id: "5",
-    author: "FLY",
-    date: "Posted 25 Sept 2026",
-    claim: "Bhavan's Vivekananda Degree College needs to stop locking the gate at 9:30 AM.",
-    description: "Every single day, students are sprinting to make it before 9:30 because the gate shuts. The narrow approach road makes traffic impossible.",
-    image: null,
-    link: "fly.html?id=5"
+// =========================================================
+//   INTD — Public feed renderer
+//   Single renderer shared by index.html (home) and feed.html.
+//   Renders real published Flies via the get_public_flies RPC.
+//   Requires config.js to be loaded first (supabaseClient).
+// =========================================================
+
+const FEED_PAGE_SIZE = 6;
+
+function buildFlyCard(fly) {
+  const card = document.createElement("article");
+  card.className = "feed-card";
+
+  let thumbnailUrl = null;
+  if (fly.evidence_image_path) {
+    const { data } = supabaseClient.storage
+      .from(EVIDENCE_BUCKET)
+      .getPublicUrl(fly.evidence_image_path);
+    thumbnailUrl = data?.publicUrl || null;
+  } else if (fly.image_urls && fly.image_urls.length > 0) {
+    thumbnailUrl = fly.image_urls[0];
   }
-];
 
-let currentIndex = 0;
-const pageSize = 3;
-const feedContainer = document.getElementById('feed-container');
-const feedEnd = document.getElementById('feed-end');
+  const imageHtml = thumbnailUrl
+    ? `<div class="feed-card-image"><img src="${escapeHtml(thumbnailUrl)}" alt="Evidence for: ${escapeHtml(fly.claim)}" loading="lazy" /></div>`
+    : "";
 
-function renderFlies() {
-  if (!feedContainer) return;
+  const formattedDate = fly.created_at
+    ? new Date(fly.created_at).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "";
 
-  if (currentIndex >= allFlies.length) {
-    if (feedEnd) feedEnd.style.display = 'block';
+  card.innerHTML = `
+    <a href="fly.html?id=${encodeURIComponent(fly.id)}" class="feed-card-link">
+      ${imageHtml}
+      <div class="feed-card-content">
+        <div class="feed-card-meta">
+          <span>FLY</span>
+          ${formattedDate ? ` • <span>${escapeHtml(formattedDate)}</span>` : ""}
+        </div>
+        <h2 class="feed-card-claim">${escapeHtml(fly.claim)}</h2>
+        <p class="feed-card-description">${escapeHtml(truncateText(fly.description || "", 180))}</p>
+        <span class="feed-card-read">Read Fly →</span>
+      </div>
+    </a>`;
+
+  return card;
+}
+
+function renderEmptyState(container, title, body, actionHref, actionLabel) {
+  container.innerHTML = `
+    <div class="feed-state">
+      <p class="eyebrow">NOTHING HERE YET</p>
+      <h2>${escapeHtml(title)}</h2>
+      <p>${escapeHtml(body)}</p>
+      ${actionHref ? `<a href="${escapeHtml(actionHref)}" class="text-link">${escapeHtml(actionLabel)}</a>` : ""}
+    </div>`;
+}
+
+async function renderPublicFeed() {
+  const container =
+    document.getElementById("feed-container") || document.getElementById("feed-list");
+  if (!container) return;
+
+  container.innerHTML = `<div class="feed-state"><p>Loading Flies...</p></div>`;
+
+  const { data, error } = await supabaseClient.rpc("get_public_flies");
+
+  if (error) {
+    console.error("Error loading public Flies:", error);
+    container.innerHTML = `
+      <div class="feed-state feed-error">
+        <h2>Couldn't load the public record</h2>
+        <p>Something went wrong retrieving published Flies. Refresh to try again.</p>
+      </div>`;
     return;
   }
 
-  const nextBatch = allFlies.slice(currentIndex, currentIndex + pageSize);
-  
-  nextBatch.forEach(fly => {
-    const card = document.createElement('article');
-    card.className = 'feed-card';
-    
-    const imageHtml = fly.image 
-      ? `<div class="feed-card-image"><img src="${fly.image}" alt="Case evidence: ${fly.claim}" loading="lazy" /></div>` 
-      : '';
+  if (!data || data.length === 0) {
+    renderEmptyState(
+      container,
+      "No published Flies yet.",
+      "Once a Fly is published, it appears here as part of the public record.",
+      "index.html",
+      "Back to home →"
+    );
+    return;
+  }
 
-    card.innerHTML = `
-      <a href="${fly.link}" class="feed-card-link">
-        ${imageHtml}
-        <div class="feed-card-content">
-          <div class="feed-card-meta">
-            <span>${fly.author}</span> • <span>${fly.date}</span>
-          </div>
-          <h2 class="feed-card-claim">${fly.claim}</h2>
-          <p class="feed-card-description">${fly.description}</p>
-          <span class="feed-card-read">View Case & Evidence →</span>
-        </div>
-      </a>
-    `;
-    
-    feedContainer.appendChild(card);
+  container.innerHTML = "";
+  data.slice(0, FEED_PAGE_SIZE).forEach((fly) => {
+    container.appendChild(buildFlyCard(fly));
   });
 
-  currentIndex += pageSize;
-
-  if (currentIndex >= allFlies.length && feedEnd) {
-    feedEnd.style.display = 'block';
+  if (data.length > FEED_PAGE_SIZE) {
+    const more = document.createElement("div");
+    more.className = "feed-state";
+    more.innerHTML = `<a href="feed.html" class="text-link">See all ${data.length} published Flies →</a>`;
+    container.appendChild(more);
   }
 }
 
-// Initial load
-renderFlies();
-
-// Infinite scroll listener
-window.addEventListener('scroll', () => {
-  const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 200;
-  if (nearBottom && currentIndex < allFlies.length) {
-    setTimeout(() => { renderFlies(); }, 300);
-  }
-});
+document.addEventListener("DOMContentLoaded", renderPublicFeed);

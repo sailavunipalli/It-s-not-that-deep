@@ -227,6 +227,84 @@ input:focus, textarea:focus {
   border-color: var(--text);
 }
 
+/* Auth */
+[hidden] { display: none !important; }
+
+.auth-section { margin-bottom: 48px; }
+
+.auth-card {
+  max-width: var(--content-width);
+  margin: 0 auto 48px auto;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.auth-card h2 { margin-bottom: 8px; }
+
+.auth-lede {
+  margin-bottom: 24px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.auth-card form { max-width: 100%; margin: 0; }
+
+.auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-status-ok {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.password-wrapper { position: relative; }
+.password-wrapper input { padding-right: 44px; }
+
+.toggle-password-btn {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  width: 36px;
+  min-height: 36px;
+  padding: 0;
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid transparent;
+}
+.toggle-password-btn:hover { color: var(--text); background: var(--surface-3); }
+
+.toggle-password-btn .eye-closed { display: none; }
+.toggle-password-btn[aria-pressed="true"] .eye-open { display: none; }
+.toggle-password-btn[aria-pressed="true"] .eye-closed { display: block; }
+
+.session-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.session-identity { display: flex; flex-direction: column; }
+
+.session-label {
+  color: var(--text-dim);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.session-identity strong { font-size: 1rem; font-weight: 600; }
+
 /* Dropzone & File Uploads */
 .dropzone {
   display: flex;
@@ -308,6 +386,14 @@ input:focus, textarea:focus {
   color: var(--text-muted);
   font-size: 1.05rem;
 }
+
+.profile-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.profile-list-header h2 { margin-bottom: 0; }
 
 .recent-flies-grid, 
 #flies-list, 

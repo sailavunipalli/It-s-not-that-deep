@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>It's Not That Deep — Edit Fly</title>
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body>
 
@@ -18,7 +18,7 @@
   </nav>
 
   <main class="fly-wrapper">
-    <h1>Edit Fly</h1>
+    <h1 id="page-title">Edit Fly</h1>
 
     <p id="progress-status" class="eyebrow"></p>
 
@@ -66,7 +66,7 @@
       <label for="impact-text">Impact — how this makes things better</label>
       <textarea id="impact-text" rows="3"></textarea>
 
-      <div style="display: flex; gap: 12px; margin-top: 16px;">
+      <div id="form-actions" style="display: flex; gap: 12px; margin-top: 16px;">
         <button type="submit" id="save-btn" class="primary-btn">Save Changes</button>
         <button type="button" id="publish-btn" class="secondary-btn">Publish Fly</button>
         <button type="button" id="unpublish-btn" class="secondary-btn" style="display: none">Unpublish</button>
@@ -78,11 +78,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
   <script>
-    const SUPABASE_URL = "https://uydfxwnppzglcrxkaxlf.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5ZGZ4d25wcHpnbGNyeGtheGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjQxNjgsImV4cCI6MjEwNTgwMDE2OH0.zCRirCvgtB18lFgB0Q48eLSIbKTJvfaJlx-WIhrYNJI";
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     async function processFileForUpload(file) {
       const isHeic = file.type === "image/heic" || file.type === "image/heif" || /\.(heic|heif)$/i.test(file.name);
       if (!isHeic) return file;
@@ -122,6 +119,7 @@
 
     const params = new URLSearchParams(window.location.search);
     const flyId = params.get("id");
+    const isCreateMode = !flyId;
 
     const form = document.getElementById("edit-form");
     const claimText = document.getElementById("claim-text");
@@ -180,9 +178,9 @@
       document.getElementById("new-images-status"),
       (files) => {
         imageLimitError.style.display = "none";
-        const allowed = 5 - currentImageUrls.length - pendingNewImages.length;
+        const allowed = MAX_GALLERY_IMAGES - currentImageUrls.length - pendingNewImages.length;
         if (files.length > allowed) {
-          imageLimitError.textContent = `You can add up to ${allowed} more photo(s) — you already have ${currentImageUrls.length + pendingNewImages.length}/5.`;
+          imageLimitError.textContent = `You can add up to ${allowed} more photo(s) — you already have ${currentImageUrls.length + pendingNewImages.length}/${MAX_GALLERY_IMAGES}.`;
           imageLimitError.style.display = "block";
           return;
         }
@@ -225,7 +223,7 @@
         const index = parseInt(e.target.dataset.index, 10);
         const urlToRemove = currentImageUrls[index];
         const path = urlToRemove.split("/fly-images/")[1];
-        if (path) await supabaseClient.storage.from("fly-images").remove([path]);
+        if (path) await supabaseClient.storage.from(GALLERY_BUCKET).remove([path]);
         currentImageUrls.splice(index, 1);
         const { error } = await supabaseClient.from("flies").update({ image_urls: currentImageUrls }).eq("id", flyId);
         if (error) output.textContent = "Error removing image: " + error.message;
@@ -238,7 +236,16 @@
       if (!session) { window.location.href = "index.html"; return; }
       currentUserId = session.user.id;
 
-      if (!flyId) { output.textContent = "No Fly ID provided."; return; }
+      if (isCreateMode) {
+        document.getElementById("page-title").textContent = "New Fly";
+        saveBtn.textContent = "Create Fly";
+        publishBtn.style.display = "none";
+        unpublishBtn.style.display = "none";
+        document.getElementById("current-image").textContent = "No photo attached.";
+        output.textContent = "";
+        updateProgress();
+        return;
+      }
 
       output.textContent = "Loading Fly...";
 
@@ -266,7 +273,7 @@
       publishBtn.style.display = currentPublished ? "none" : "inline-flex";
 
       if (currentImagePath) {
-        const { data: signedData } = await supabaseClient.storage.from("evidence").createSignedUrl(currentImagePath, 3600);
+        const { data: signedData } = await supabaseClient.storage.from(EVIDENCE_BUCKET).createSignedUrl(currentImagePath, 3600);
         if (signedData) document.getElementById("current-image").innerHTML = `<img src="${signedData.signedUrl}" class="fly-thumbnail" alt="Evidence photo" />`;
       } else {
         document.getElementById("current-image").textContent = "No photo attached.";
@@ -320,8 +327,8 @@
 
       const newFiles = pendingNewImages;
       const totalCount = currentImageUrls.length + newFiles.length;
-      if (totalCount > 5) {
-        imageLimitError.textContent = `That's ${totalCount} total photos. Max is 5. Remove some before saving.`;
+      if (totalCount > MAX_GALLERY_IMAGES) {
+        imageLimitError.textContent = `That's ${totalCount} total photos. Max is ${MAX_GALLERY_IMAGES}. Remove some before saving.`;
         imageLimitError.style.display = "block";
         return;
       }
@@ -334,47 +341,69 @@
 
       if (newImageFile) {
         const filePath = `${currentUserId}/${Date.now()}-${newImageFile.name}`;
-        const { error: uploadError } = await supabaseClient.storage.from("evidence").upload(filePath, newImageFile);
+        const { error: uploadError } = await supabaseClient.storage.from(EVIDENCE_BUCKET).upload(filePath, newImageFile);
         if (uploadError) {
           output.textContent = "Image upload failed: " + uploadError.message;
-          saveBtn.disabled = false; saveBtn.textContent = "Save Changes";
+          saveBtn.disabled = false; saveBtn.textContent = isCreateMode ? "Create Fly" : "Save Changes";
           return;
         }
-        if (currentImagePath) await supabaseClient.storage.from("evidence").remove([currentImagePath]);
+        if (currentImagePath) await supabaseClient.storage.from(EVIDENCE_BUCKET).remove([currentImagePath]);
         imagePath = filePath;
       }
 
       const uploadedUrls = [];
       for (const file of newFiles) {
         const filePath = `${currentUserId}/${Date.now()}-${file.name}`;
-        const { error: uploadError } = await supabaseClient.storage.from("fly-images").upload(filePath, file);
+        const { error: uploadError } = await supabaseClient.storage.from(GALLERY_BUCKET).upload(filePath, file);
         if (uploadError) {
           output.textContent = "Image upload failed: " + uploadError.message;
-          saveBtn.disabled = false; saveBtn.textContent = "Save Changes";
+          saveBtn.disabled = false; saveBtn.textContent = isCreateMode ? "Create Fly" : "Save Changes";
           return;
         }
-        const { data: publicUrlData } = supabaseClient.storage.from("fly-images").getPublicUrl(filePath);
+        const { data: publicUrlData } = supabaseClient.storage.from(GALLERY_BUCKET).getPublicUrl(filePath);
         uploadedUrls.push(publicUrlData.publicUrl);
       }
 
       const finalImageUrls = [...currentImageUrls, ...uploadedUrls];
 
+      const payload = {
+        claim: claimText.value,
+        description: descriptionText.value,
+        evidence: evidenceText.value,
+        full_story: fullStoryText.value,
+        conclusion: conclusionText.value,
+        impact: impactText.value,
+        evidence_image_path: imagePath,
+        image_urls: finalImageUrls,
+      };
+
+      const idleLabel = isCreateMode ? "Create Fly" : "Save Changes";
+
+      if (isCreateMode) {
+        const { data, error } = await supabaseClient
+          .from("flies")
+          .insert([{ ...payload, user_id: currentUserId }])
+          .select("id")
+          .single();
+
+        if (error) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = idleLabel;
+          output.textContent = "Error creating Fly: " + error.message;
+          return;
+        }
+
+        window.location.href = "edit.html?id=" + encodeURIComponent(data.id);
+        return;
+      }
+
       const { error } = await supabaseClient
         .from("flies")
-        .update({
-          claim: claimText.value,
-          description: descriptionText.value,
-          evidence: evidenceText.value,
-          full_story: fullStoryText.value,
-          conclusion: conclusionText.value,
-          impact: impactText.value,
-          evidence_image_path: imagePath,
-          image_urls: finalImageUrls,
-        })
+        .update(payload)
         .eq("id", flyId);
 
       saveBtn.disabled = false;
-      saveBtn.textContent = "Save Changes";
+      saveBtn.textContent = idleLabel;
 
       if (error) {
         output.textContent = "Error saving: " + error.message;
