@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>It's Not That Deep — Edit Fly</title>
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=6" />
 </head>
 <body>
 
@@ -63,7 +63,7 @@
       <label for="conclusion-text">Conclusion</label>
       <textarea id="conclusion-text" rows="3"></textarea>
 
-      <label for="impact-text">Impact — how this makes things better</label>
+      <label for="impact-text">Why it matters</label>
       <textarea id="impact-text" rows="3"></textarea>
 
       <div id="form-actions" style="display: flex; gap: 12px; margin-top: 16px;">
@@ -79,15 +79,8 @@
   <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
+  <script src="image-utils.js"></script>
   <script>
-    async function processFileForUpload(file) {
-      const isHeic = file.type === "image/heic" || file.type === "image/heif" || /\.(heic|heif)$/i.test(file.name);
-      if (!isHeic) return file;
-      const convertedBlob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.85 });
-      const newName = file.name.replace(/\.(heic|heif)$/i, ".jpg");
-      return new File([convertedBlob], newName, { type: "image/jpeg" });
-    }
-
     function setupDropzone(dropzoneEl, fileInputEl, statusEl, onFilesReady) {
       dropzoneEl.addEventListener("click", () => fileInputEl.click());
       dropzoneEl.addEventListener("dragover", (e) => { e.preventDefault(); dropzoneEl.classList.add("dragover"); });
@@ -95,7 +88,7 @@
       dropzoneEl.addEventListener("drop", async (e) => {
         e.preventDefault();
         dropzoneEl.classList.remove("dragover");
-        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name));
+        const files = Array.from(e.dataTransfer.files).filter(isAcceptedImage);
         if (files.length) await handleFiles(files);
       });
       fileInputEl.addEventListener("change", async () => {

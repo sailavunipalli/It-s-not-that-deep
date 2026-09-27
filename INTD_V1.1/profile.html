@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>It's Not That Deep — My Profile</title>
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=6" />
 </head>
 <body>
 
@@ -18,14 +18,41 @@
   </nav>
 
   <main class="feed-page">
+
+    <!-- Identity -->
     <div class="profile-header-card">
-      <div class="avatar-circle">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+      <button type="button" id="avatar-button" class="avatar-circle" aria-label="Change profile photo">
+        <img id="avatar-img" alt="" hidden />
+        <svg id="avatar-fallback" viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
           <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
         </svg>
+      </button>
+
+      <div class="profile-identity">
+        <div id="display-name" class="profile-name">Loading user profile...</div>
+        <div id="display-email" class="profile-email"></div>
       </div>
-      <div id="display-name" class="profile-name">Loading user profile...</div>
+
+      <button type="button" id="edit-profile-btn" class="secondary-btn">Customize</button>
     </div>
+
+    <input type="file" id="avatar-input" accept="image/*,.heic,.heif" hidden />
+
+    <!-- Profile editor -->
+    <section id="profile-editor" class="auth-card" hidden>
+      <h2>Customize profile</h2>
+
+      <div class="editor-row">
+        <label for="display-name-input">Display name</label>
+        <div class="editor-inline">
+          <input type="text" id="display-name-input" maxlength="40" />
+          <button type="button" id="save-name-btn">Save</button>
+        </div>
+        <p id="name-lock-note" class="auth-status-ok"></p>
+      </div>
+
+      <p id="profile-status" role="status" aria-live="polite"></p>
+    </section>
 
     <header class="feed-header profile-list-header">
       <h2>My Flies</h2>
@@ -35,104 +62,10 @@
     <section id="flies-list" class="recent-flies-grid"></section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script>
-    async function deleteFly(flyId, imagePath, cardElement) {
-      const confirmed = confirm("Delete this Fly? This action cannot be undone.");
-      if (!confirmed) return;
-
-      const { error } = await supabaseClient.from("flies").delete().eq("id", flyId);
-      if (error) {
-        alert("Error deleting Fly: " + error.message);
-        return;
-      }
-
-      if (imagePath) {
-        await supabaseClient.storage.from(EVIDENCE_BUCKET).remove([imagePath]);
-      }
-
-      cardElement.remove();
-    }
-
-    async function init() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) {
-        window.location.href = "index.html";
-        return;
-      }
-
-      const user = session.user;
-
-      const { data: profile, error: profileError } = await supabaseClient
-        .from("profiles")
-        .select("display_name")
-        .eq("id", user.id)
-        .single();
-
-      document.getElementById("display-name").textContent = profileError || !profile
-        ? user.email || "Author Profile"
-        : profile.display_name;
-
-      const { data: flies, error: fliesError } = await supabaseClient
-        .from("flies")
-        .select("id, claim, description, created_at, evidence_image_path")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      const fliesList = document.getElementById("flies-list");
-      fliesList.innerHTML = "";
-
-      if (fliesError) {
-        fliesList.innerHTML = `<div class="feed-state"><p>Error loading Flies: ${escapeHtml(fliesError.message)}</p></div>`;
-        return;
-      }
-
-      if (flies.length === 0) {
-        fliesList.innerHTML = `<div class="feed-state"><p>No Flies created yet.</p></div>`;
-        return;
-      }
-
-      for (const fly of flies) {
-        const article = document.createElement("article");
-        article.className = "my-fly-card";
-
-        let imageHtml = "";
-        if (fly.evidence_image_path) {
-          const { data: signedData } = await supabaseClient.storage
-            .from(EVIDENCE_BUCKET)
-            .createSignedUrl(fly.evidence_image_path, 3600);
-          if (signedData) {
-            imageHtml = `<div class="feed-card-image"><img src="${signedData.signedUrl}" alt="Evidence thumbnail" /></div>`;
-          }
-        }
-
-        article.innerHTML = `
-          ${imageHtml}
-          <div class="feed-card-content">
-            <div class="feed-card-meta">CREATED ${new Date(fly.created_at).toLocaleDateString()}</div>
-            <h2 class="feed-card-claim">${escapeHtml(fly.claim)}</h2>
-            <p class="feed-card-description">${escapeHtml(fly.description)}</p>
-            <div class="feed-card-footer">
-              <a href="edit.html?id=${fly.id}" class="secondary-btn">Edit Fly</a>
-              <button type="button" class="secondary-btn delete-btn" data-id="${fly.id}" data-image="${fly.evidence_image_path || ""}">Delete</button>
-            </div>
-          </div>`;
-
-        fliesList.appendChild(article);
-      }
-
-      fliesList.addEventListener("click", function (e) {
-        if (e.target.classList.contains("delete-btn")) {
-          const flyId = e.target.dataset.id;
-          const imagePath = e.target.dataset.image;
-          const cardElement = e.target.closest("article");
-          deleteFly(flyId, imagePath, cardElement);
-        }
-      });
-    }
-
-    init();
-  </script>
+  <script src="image-utils.js"></script>
+  <script src="profile.js"></script>
 </body>
 </html>

@@ -14,6 +14,13 @@ const EVIDENCE_BUCKET = "evidence";
 const GALLERY_BUCKET = "fly-images";
 const MAX_GALLERY_IMAGES = 5;
 
+// Avatars live under the user's own folder in GALLERY_BUCKET, matching the
+// path shape the existing storage policies already allow. Promote to a
+// dedicated 'avatars' bucket later if you want them separated at the
+// storage layer.
+const AVATAR_PREFIX = "avatars";
+const DISPLAY_NAME_COOLDOWN_DAYS = 14;
+
 // Shared HTML escaping. Every value rendered into innerHTML goes through this.
 function escapeHtml(value) {
   if (value === null || value === undefined) return "";

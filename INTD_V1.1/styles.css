@@ -180,7 +180,7 @@ button:disabled, .primary-btn:disabled, .secondary-btn:disabled {
   cursor: not-allowed;
 }
 
-.primary-btn, button:not(.secondary-btn):not(.toggle-password-btn):not(.fly-gallery-arrow):not(.lightbox-arrow):not(.lightbox-close):not(.remove-image-btn):not(.remove-pending-btn):not(.fly-gallery-dot) {
+.primary-btn, button:not(.secondary-btn):not(.toggle-password-btn):not(.avatar-circle):not(.fly-gallery-arrow):not(.lightbox-arrow):not(.lightbox-close):not(.remove-image-btn):not(.remove-pending-btn):not(.fly-gallery-dot) {
   background: var(--text);
   color: var(--bg);
   border-color: var(--text);
@@ -508,20 +508,54 @@ input:focus, textarea:focus {
 }
 
 .avatar-circle {
-  width: 48px;
-  height: 48px;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  min-height: unset;
+  padding: 0;
+  border: 1px solid var(--border-strong);
   border-radius: 50%;
   background: var(--surface-3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: var(--text-muted);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+.avatar-circle:hover { border-color: var(--text); color: var(--text); }
+.avatar-circle:disabled { opacity: 0.5; cursor: wait; }
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-identity {
+  flex: 1;
+  min-width: 0;
 }
 
 .profile-name {
   font-size: 1.2rem;
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
+
+.profile-email {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.editor-row { margin-bottom: 8px; }
+
+.editor-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 460px;
+}
+.editor-inline input { flex: 1; }
+.editor-inline button { flex-shrink: 0; }
 
 /* =========================================================
    6. FLY DETAIL & GALLERY
