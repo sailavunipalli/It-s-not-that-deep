@@ -189,6 +189,7 @@ function initTicker() {
     }
 
     tickerItems = items;
+    section.hidden = false;
     paintTicker();
 
     // Both keys always show. Anyone can see an orange claim now, so the
