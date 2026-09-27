@@ -6,7 +6,7 @@
 // =========================================================
 
 const FEED_PAGE_SIZE = 6;
-const TICKER_INTERVAL_MS = 2600;
+const TICKER_INTERVAL_MS = 3600;
 const TICKER_ITEM_LIMIT = 10;
 
 function buildFlyCard(fly) {
