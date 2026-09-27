@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTD — It's Not That Deep</title>
-  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="styles.css?v=9">
 </head>
 <body>
 
@@ -36,7 +36,7 @@
         <form id="auth-form" autocomplete="on">
           <div id="display-name-field">
             <label for="auth-display-name">Display name</label>
-            <input type="text" id="auth-display-name" placeholder="How your name appears on a Fly" autocomplete="nickname" />
+            <input type="text" id="auth-display-name" placeholder="Display name" autocomplete="nickname" />
           </div>
 
           <div>
@@ -86,10 +86,27 @@
       <h2 id="ticker-heading" class="ticker-heading">Recent Flies</h2>
 
       <div class="ticker-window" id="ticker-window">
-        <a id="ticker-link" class="ticker-item" href="feed.html">
+        <div class="ticker-item">
           <span class="ticker-dot" id="ticker-dot" data-state="published" aria-hidden="true"></span>
           <span class="ticker-claim" id="ticker-claim"></span>
-        </a>
+
+          <!-- Published: the only thing here that navigates. -->
+          <a id="ticker-read" class="ticker-read" href="feed.html" hidden>
+            Read the Fly
+          </a>
+
+          <!-- Unpublished: prototype only. Follow does nothing yet. -->
+          <span class="ticker-pending">
+            <span class="ticker-pending-label">Yet to be published</span>
+            <button type="button" id="ticker-follow" class="ticker-follow" aria-label="Follow this Fly and get notified when it is published">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              <span>Follow</span>
+            </button>
+          </span>
+        </div>
       </div>
 
       <p class="ticker-legend">

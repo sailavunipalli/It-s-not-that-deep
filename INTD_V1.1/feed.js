@@ -7,6 +7,7 @@
 
 const FEED_PAGE_SIZE = 6;
 const TICKER_INTERVAL_MS = 2600;
+const TICKER_ITEM_LIMIT = 10;
 
 function buildFlyCard(fly) {
   const card = document.createElement("article");
@@ -126,28 +127,35 @@ async function loadTickerItems() {
     return [];
   }
 
-  return (data || []).map((fly) => ({
-    id: fly.id,
-    claim: fly.claim,
-    state: fly.published ? "published" : "draft",
-  }));
+  return (data || [])
+    .map((fly) => ({
+      id: fly.id,
+      claim: fly.claim,
+      state: fly.published ? "published" : "draft",
+    }))
+    .slice(0, TICKER_ITEM_LIMIT);
 }
 
 function paintTicker() {
-  const link = document.getElementById("ticker-link");
   const claim = document.getElementById("ticker-claim");
   const dot = document.getElementById("ticker-dot");
+  const read = document.getElementById("ticker-read");
+  const pending = document.querySelector(".ticker-pending");
   const item = tickerItems[tickerIndex];
   if (!item) return;
 
-  link.href = "fly.html?id=" + encodeURIComponent(item.id);
+  const isPublished = item.state === "published";
 
   claim.textContent = item.claim;
   dot.dataset.state = item.state;
-  link.setAttribute(
-    "aria-label",
-    (item.state === "published" ? "Published Fly: " : "Unpublished Fly: ") + item.claim
-  );
+
+  // The claim itself is inert. Navigation happens only through the
+  // explicit "Read the Fly" button on published items.
+  read.hidden = !isPublished;
+  pending.hidden = isPublished;
+  if (isPublished) {
+    read.href = "fly.html?id=" + encodeURIComponent(item.id);
+  }
 }
 
 function stepTicker() {
@@ -194,6 +202,15 @@ function initTicker() {
     window_.addEventListener("focusin", () => setTickerPaused(true));
     window_.addEventListener("focusout", () => setTickerPaused(false));
     document.addEventListener("visibilitychange", () => setTickerPaused(document.hidden));
+
+    // Prototype. Follow is inert on purpose: the notification backend
+    // is a later version. This is the affordance, not the feature.
+    const follow = document.getElementById("ticker-follow");
+    follow.addEventListener("click", () => {
+      follow.classList.add("is-following");
+      follow.querySelector("span").textContent = "Following";
+      follow.setAttribute("aria-pressed", "true");
+    });
 
     setTickerPaused(false);
   });

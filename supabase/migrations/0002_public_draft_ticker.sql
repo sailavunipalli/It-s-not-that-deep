@@ -17,6 +17,11 @@
 
 -- Returns the newest Flies regardless of published state.
 -- Built as jsonb so this does not depend on the column type of flies.id.
+--
+-- limit 12 is fetch headroom. The ticker displays the newest 10, set by
+-- TICKER_ITEM_LIMIT in INTD_V1.1/feed.js. Keeping the fetch slightly
+-- wider than the display window means the client can change how many
+-- claims it shows without another database migration.
 create or replace function public.get_ticker_flies()
 returns setof jsonb
 language sql

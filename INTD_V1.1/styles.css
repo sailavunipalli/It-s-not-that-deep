@@ -254,16 +254,15 @@ input:focus, textarea:focus {
 
 .ticker-item {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
-  color: var(--text);
-  text-decoration: none;
+  min-height: 30px;
 }
-.ticker-item:hover .ticker-claim { color: var(--text-muted); }
 
 .ticker-claim {
   flex: 1;
   min-width: 0;
+  color: var(--text);
   font-size: 0.95rem;
   font-weight: 500;
   white-space: nowrap;
@@ -275,12 +274,66 @@ input:focus, textarea:focus {
   flex-shrink: 0;
   width: 7px;
   height: 7px;
-  margin-top: 1px;
   border-radius: 50%;
   background: var(--text-dim);
 }
 .ticker-dot[data-state="published"] { background: #4ade80; }
 .ticker-dot[data-state="draft"] { background: #fbbf24; }
+
+.ticker-read {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.74rem;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: border-color 150ms linear, color 150ms linear;
+}
+.ticker-read:hover {
+  border-color: var(--text-dim);
+  color: var(--text-muted);
+}
+
+.ticker-pending {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ticker-pending-label {
+  color: var(--text-dim);
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+
+.ticker-follow {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 3px 7px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.6rem;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 150ms linear, color 150ms linear;
+}
+.ticker-follow:hover { border-color: var(--text-dim); }
+
+.ticker-follow.is-following {
+  border-color: #fbbf24;
+  color: #fbbf24;
+  cursor: default;
+}
 
 .ticker-legend {
   display: flex;
