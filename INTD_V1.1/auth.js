@@ -35,6 +35,27 @@ if (authSection && sessionBar) {
     }
   }
 
+  // Where to send the visitor after they authenticate. Signed-out taps
+  // on a Fly's like button land here carrying ?next=<that Fly>.
+  //
+  // Only same-site relative paths are honoured. Anything with a scheme
+  // (https://elsewhere.example) or a protocol-relative form (//elsewhere)
+  // is rejected, because a login page that forwards to an arbitrary
+  // origin is a working phishing vector.
+  function safeNext() {
+    const raw = new URLSearchParams(window.location.search).get("next");
+    if (!raw) return null;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(raw)) return null;
+    if (raw.startsWith("//")) return null;
+    if (!raw.startsWith("fly.html") && !raw.startsWith("index.html")) return null;
+    return raw;
+  }
+
+  function goToNext() {
+    const next = safeNext();
+    if (next) window.location.href = next;
+  }
+
   async function resolveDisplayName(user) {
     const { data } = await supabaseClient
       .from("profiles")
@@ -88,6 +109,11 @@ if (authSection && sessionBar) {
         : "Signed in. Start your first Fly.",
       Boolean(profileError)
     );
+
+    // Only bounce back when a session actually exists. A fresh signup
+    // usually has to confirm its email first, and redirecting into that
+    // gap would just dump them back on a page they cannot act on.
+    if (!profileError && data.session) goToNext();
   });
 
   loginBtn.addEventListener("click", async () => {
@@ -100,7 +126,12 @@ if (authSection && sessionBar) {
     });
 
     setBusy(loginBtn, false);
-    setStatus(error ? "Login failed: " + error.message : "Logged in.", Boolean(error));
+    if (error) {
+      setStatus("Login failed: " + error.message, true);
+    } else {
+      setStatus("Logged in.", false);
+      goToNext();
+    }
   });
 
   logoutBtn.addEventListener("click", async () => {

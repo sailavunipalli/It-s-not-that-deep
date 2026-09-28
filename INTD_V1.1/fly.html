@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>It's Not That Deep — Fly</title>
-  <link rel="stylesheet" href="styles.css?v=9" />
+  <link rel="stylesheet" href="styles.css?v=10" />
 </head>
 <body>
 
@@ -36,6 +36,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
+  <script src="likes.js"></script>
   <script>
     let images = [];
     let galleryIndex = 0;
@@ -189,6 +190,16 @@
             <p class="fly-label">FLY</p>
             <h1 class="fly-claim">${escapeHtml(data.claim || "")}</h1>
             ${formattedDate ? `<p class="fly-meta">Published ${formattedDate}</p>` : ""}
+
+            <div class="fly-like-row">
+              <button type="button" id="fly-like" class="like-btn" data-fly-id="${escapeHtml(data.id || "")}" aria-pressed="false" aria-label="Like this Fly" disabled>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+                <span class="like-count">0</span>
+              </button>
+              <span class="like-note" id="like-note" role="status" aria-live="polite"></span>
+            </div>
           </header>
 
           ${buildGalleryHtml()}
@@ -223,6 +234,11 @@
         </article>`;
 
       wireGallery();
+
+      // The like button only exists now that the Fly markup is in the
+      // DOM. likes.js also tries on DOMContentLoaded, which fires
+      // before this render completes and finds nothing.
+      if (typeof initFlyLike === "function") initFlyLike();
     }
 
     loadFly();

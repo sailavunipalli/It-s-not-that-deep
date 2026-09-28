@@ -383,6 +383,59 @@ input:focus, textarea:focus {
   background: #fbbf24;
 }
 
+/* Fly like */
+.fly-like-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 150ms linear, color 150ms linear;
+}
+
+.like-btn:hover:not(:disabled) {
+  border-color: var(--text-dim);
+  color: var(--text);
+}
+
+.like-btn:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.like-btn.is-liked {
+  border-color: #fbbf24;
+  color: #fbbf24;
+}
+.like-btn.is-liked svg { fill: #fbbf24; }
+
+.like-count {
+  min-width: 1ch;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+.like-note {
+  color: var(--text-dim);
+  font-size: 0.74rem;
+}
+.like-note.is-error { color: #fbbf24; }
+
 /* Auth */
 [hidden] { display: none !important; }
 
