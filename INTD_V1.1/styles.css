@@ -620,6 +620,7 @@ input:focus, textarea:focus {
 .feed-card, .my-fly-card {
   display: flex;
   flex-direction: column;
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
@@ -633,12 +634,26 @@ input:focus, textarea:focus {
   background: var(--surface-2);
 }
 
-.feed-card-link {
-  text-decoration: none;
-  color: inherit;
+.feed-card-body {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+}
+
+/* The whole card navigates from the claim link alone, rather than by
+   wrapping everything in an anchor. Wrapping is what previously made a
+   like button impossible to place: a button inside an anchor is invalid
+   and unusable. Stretching a ::after off the claim link covers the card
+   without nesting anything. */
+.feed-card-claim a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.feed-card-claim a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
 }
 
 .feed-card-meta {
@@ -679,9 +694,6 @@ input:focus, textarea:focus {
 
 .feed-card-read {
   display: inline-block;
-  margin-top: auto;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text);
@@ -695,6 +707,19 @@ input:focus, textarea:focus {
   padding-top: 16px;
   margin-top: auto;
   border-top: 1px solid var(--border);
+  /* Above the stretched card link, so the like button is genuinely
+     clickable instead of being swallowed by the overlay. Without this,
+     every card's like button would be dead. */
+  position: relative;
+  z-index: 1;
+}
+
+/* Right-hand position on every card, public feed and own profile alike,
+   so the two card lists read as the same component. */
+.feed-card-footer .like-btn {
+  margin-left: auto;
+  padding: 5px 11px;
+  font-size: 0.75rem;
 }
 
 .feed-state {

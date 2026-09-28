@@ -175,7 +175,7 @@ saveNameBtn.addEventListener("click", async () => {
 async function loadMyFlies(user) {
   const { data: flies, error: fliesError } = await supabaseClient
     .from("flies")
-    .select("id, claim, description, created_at, evidence_image_path")
+    .select("id, claim, description, created_at, evidence_image_path, published")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -206,6 +206,8 @@ async function loadMyFlies(user) {
       }
     }
 
+    const isPublished = Boolean(fly.published);
+
     article.innerHTML = `
       ${imageHtml}
       <div class="feed-card-content">
@@ -215,10 +217,19 @@ async function loadMyFlies(user) {
         <div class="feed-card-footer">
           <a href="edit.html?id=${encodeURIComponent(fly.id)}" class="secondary-btn">Edit Fly</a>
           <button type="button" class="secondary-btn delete-btn" data-id="${fly.id}" data-image="${fly.evidence_image_path || ""}">Delete</button>
+          ${isPublished && typeof buildLikeButtonHtml === "function" ? buildLikeButtonHtml(fly.id, 0) : ""}
         </div>
       </div>`;
 
     fliesList.appendChild(article);
+  }
+
+  // Same shared button as the public feed, same footer, same right-hand
+  // position. Drafts get no control at all: nobody can read an
+  // unpublished Fly, so there is nothing to like and like_fly would
+  // refuse it anyway.
+  if (typeof hydrateLikeButtons === "function") {
+    hydrateLikeButtons(fliesList);
   }
 
   fliesList.addEventListener("click", function (e) {

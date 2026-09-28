@@ -35,19 +35,23 @@ function buildFlyCard(fly) {
       })
     : "";
 
+  const likeCount = Number(fly.like_count) || 0;
+  const href = "fly.html?id=" + encodeURIComponent(fly.id);
+
   card.innerHTML = `
-    <a href="fly.html?id=${encodeURIComponent(fly.id)}" class="feed-card-link">
+    <div class="feed-card-body">
       ${imageHtml}
-      <div class="feed-card-content">
-        <div class="feed-card-meta">
-          <span>FLY</span>
-          ${formattedDate ? ` • <span>${escapeHtml(formattedDate)}</span>` : ""}
-        </div>
-        <h2 class="feed-card-claim">${escapeHtml(fly.claim)}</h2>
-        <p class="feed-card-description">${escapeHtml(truncateText(fly.description || "", 180))}</p>
-        <span class="feed-card-read">Read Fly →</span>
+      <div class="feed-card-meta">
+        <span>FLY</span>
+        ${formattedDate ? ` • <span>${escapeHtml(formattedDate)}</span>` : ""}
       </div>
-    </a>`;
+      <h2 class="feed-card-claim"><a href="${href}">${escapeHtml(fly.claim)}</a></h2>
+      <p class="feed-card-description">${escapeHtml(truncateText(fly.description || "", 180))}</p>
+    </div>
+    <div class="feed-card-footer">
+      <span class="feed-card-read">Read Fly →</span>
+      ${buildLikeButtonHtml(fly.id, likeCount)}
+    </div>`;
 
   return card;
 }
@@ -60,6 +64,36 @@ function renderEmptyState(container, title, body, actionHref, actionLabel) {
       <p>${escapeHtml(body)}</p>
       ${actionHref ? `<a href="${escapeHtml(actionHref)}" class="text-link">${escapeHtml(actionLabel)}</a>` : ""}
     </div>`;
+}
+
+// Order the public record by how many readers liked each Fly, newest
+// first among ties. This is a sort of what is already public, not
+// promotion: nothing is featured, boosted or paid for, and the like
+// count is the only thing that moves a Fly up. The count is rendered
+// on the card because an order nobody can see the reason for is worse
+// than no order at all.
+async function fetchLikeCounts(flyIds) {
+  if (flyIds.length === 0) return new Map();
+
+  const { data, error } = await supabaseClient.rpc("get_fly_like_counts", {
+    p_fly_ids: flyIds,
+  });
+
+  if (error) {
+    console.error("Could not load like counts, falling back to newest first:", error);
+    return new Map();
+  }
+
+  return new Map((data || []).map((row) => [row.fly_id, row]));
+}
+
+function sortByLikes(flies, counts) {
+  return [...flies].sort((a, b) => {
+    const diff =
+      (counts.get(b.id)?.like_count || 0) - (counts.get(a.id)?.like_count || 0);
+    if (diff !== 0) return diff;
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
 }
 
 async function renderPublicFeed() {
@@ -93,7 +127,17 @@ async function renderPublicFeed() {
   }
 
   container.innerHTML = "";
-  data.slice(0, FEED_PAGE_SIZE).forEach((fly) => {
+
+  const counts = await fetchLikeCounts(data.map((fly) => fly.id));
+
+  const withCounts = data.map((fly) => {
+    const row = counts.get(fly.id);
+    return { ...fly, like_count: row?.like_count || 0 };
+  });
+
+  const ordered = sortByLikes(withCounts, counts);
+
+  ordered.slice(0, FEED_PAGE_SIZE).forEach((fly) => {
     container.appendChild(buildFlyCard(fly));
   });
 
@@ -103,6 +147,12 @@ async function renderPublicFeed() {
     more.innerHTML = `<a href="feed.html" class="text-link">See all ${data.length} published Flies →</a>`;
     container.appendChild(more);
   }
+
+  // The counts read above already carry this viewer's liked state, so
+  // the feed settles in one query rather than two. The buttons were
+  // rendered disabled; this is what makes them live and fills in the
+  // ones this reader has already liked.
+  if (typeof applyLikeState === "function") applyLikeState(container, counts);
 }
 
 // =========================================================
